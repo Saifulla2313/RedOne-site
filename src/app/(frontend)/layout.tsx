@@ -1,18 +1,39 @@
-import React from 'react'
-import './styles.css'
+import type { Metadata } from 'next'
+import { Montserrat } from 'next/font/google'
+import { Suspense } from 'react'
+import { CookieBar } from '@/components/site/CookieBar'
+import { Footer } from '@/components/site/Footer'
+import { Header } from '@/components/site/Header'
+import { OfficeSection } from '@/components/site/OfficeSection'
+import { Reveal } from '@/components/site/Reveal'
+import { getBrand, getContacts, getMenu } from '@/lib/site/data'
+import './site.css'
 
-export const metadata = {
-  description: 'A blank template using Payload in a Next.js app.',
-  title: 'Payload Blank Template',
+const montserrat = Montserrat({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--f',
+  display: 'swap',
+})
+
+export const metadata: Metadata = {
+  title: { default: 'RedONE — дизайн интерьера и архитектура', template: '%s — RedONE' },
+  description: '[Описание бюро для поиска: услуги, города, опыт.]',
 }
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
-  const { children } = props
-
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const [menu, brand, contacts] = await Promise.all([getMenu(), getBrand(), getContacts()])
   return (
-    <html lang="en">
+    <html lang="ru" className={montserrat.variable}>
       <body>
-        <main>{children}</main>
+        <Header menu={menu} logo={brand.logo} />
+        {children}
+        <OfficeSection photos={brand.officeSlider} />
+        <Footer contacts={contacts} />
+        <CookieBar />
+        <Suspense>
+          <Reveal />
+        </Suspense>
       </body>
     </html>
   )

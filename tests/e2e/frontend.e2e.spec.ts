@@ -1,20 +1,17 @@
-import { test, expect, Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Frontend', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }, testInfo) => {
-    const context = await browser.newContext()
-    page = await context.newPage()
+  test('главная: слоган и новые проекты', async ({ page }) => {
+    await page.goto('http://localhost:3000')
+    await expect(page).toHaveTitle(/RedONE/)
+    await expect(page.locator('.hero h1')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Новые проекты' })).toBeVisible()
   })
 
-  test('can go on homepage', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-
-    await expect(page).toHaveTitle(/Payload Blank Template/)
-
-    const heading = page.locator('h1').first()
-
-    await expect(heading).toHaveText('Welcome to your new project.')
+  test('квиз: переход на следующий шаг', async ({ page }) => {
+    await page.goto('http://localhost:3000/kviz')
+    await expect(page.getByText('Шаг 1/')).toBeVisible()
+    await page.getByRole('button', { name: /Далее/ }).click()
+    await expect(page.getByText('Шаг 2/')).toBeVisible()
   })
 })
