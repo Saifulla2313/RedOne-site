@@ -183,7 +183,7 @@ export const Quiz: GlobalConfig = {
   admin: {
     group: 'Настройки',
     hidden: hiddenUnless('admin', 'editor', 'manager'),
-    description: 'Шаги квиза и ставки, из которых сайт считает вилку цены: ставка × площадь × коэффициент, −10% / +15%.',
+    description: 'Шаги квиза. Расчёт стоимости на шаге «Ползунок площади» сайт берёт из «Прайса».',
   },
   access: { read: anyone, update: contentEditors },
   fields: [
@@ -194,8 +194,11 @@ export const Quiz: GlobalConfig = {
       defaultValue: [
         { question: 'Тип объекта', kind: 'options', options: 'Квартира\nДом\nКоммерческое помещение' },
         { question: 'Площадь', kind: 'slider' },
-        { question: 'Состояние', kind: 'options', options: 'Бетон\nWhite box\nВторичка' },
-        { question: 'Пакет', kind: 'options', options: 'Планировочный\nСтандарт\nПолный' },
+        {
+          question: 'Что нужно',
+          kind: 'options',
+          options: 'Пакет FULL: проект и ремонт под ключ\nТолько дизайн-проект\nОтдельные услуги\nНужна консультация',
+        },
         { question: 'Срок', kind: 'options', options: 'В течение месяца\nЧерез 2–3 месяца\nПока присматриваюсь' },
         { question: 'Как с вами связаться', kind: 'contacts' },
       ],
@@ -226,67 +229,139 @@ export const Quiz: GlobalConfig = {
       type: 'textarea',
       defaultValue: 'Оставьте телефон: пришлём расчёт и подборку проектов вашей площади.',
     },
+  ],
+}
+
+export const Pricing: GlobalConfig = {
+  slug: 'pricing',
+  label: 'Прайс',
+  admin: {
+    group: 'Услуги',
+    hidden: hiddenUnless('admin', 'editor', 'manager'),
+    description:
+      'Таблица цен на /ceny, пакет FULL и калькулятор в квизе. Считаются только строки в ₽/м².',
+  },
+  access: { read: anyone, update: contentEditors },
+  fields: [
     {
-      name: 'rates',
-      label: 'Ставки за м²',
+      name: 'items',
+      label: 'Услуги',
       type: 'array',
+      labels: { singular: 'Услуга', plural: 'Услуги' },
+      admin: { initCollapsed: true },
       defaultValue: [
-        { objectType: 'apartment', pkg: 'planning', rate: 1500 },
-        { objectType: 'apartment', pkg: 'standard', rate: 3500 },
-        { objectType: 'apartment', pkg: 'full', rate: 5500 },
-        { objectType: 'house', pkg: 'standard', rate: 3000 },
-        { objectType: 'house', pkg: 'full', rate: 5000 },
-        { objectType: 'commercial', pkg: 'standard', rate: 4000 },
+        { title: 'Замер помещения (2 выезда)', unit: 'm2', price: 100, inFull: 'gift' },
+        { title: 'Планировочное решение', unit: 'm2', price: 500, inFull: 'gift' },
+        { title: 'Визуализация', unit: 'm2', price: 2000, inFull: 'same' },
+        { title: 'Чертёжная документация', unit: 'm2', price: 1500, inFull: 'same' },
+        { title: 'Инженерная документация', unit: 'm2', price: 1500, inFull: 'gift' },
+        { title: 'Смета ремонтных работ', unit: 'm2', price: 1000, inFull: 'gift' },
+        {
+          title: 'Комплектация',
+          unit: 'percent',
+          price: 10,
+          basis: 'от стоимости закупок',
+          inFull: 'same',
+        },
+        { title: 'Авторский надзор', unit: 'month', price: 50000, inFull: 'gift' },
+        {
+          title: 'Ведение строительных работ (прораб)',
+          unit: 'percent',
+          price: 15,
+          basis: 'от стоимости работ',
+          inFull: 'same',
+        },
       ],
       fields: [
         {
           type: 'row',
           fields: [
+            { name: 'title', label: 'Услуга', type: 'text', required: true },
             {
-              name: 'objectType',
-              label: 'Объект',
+              name: 'service',
+              label: 'Страница услуги',
+              type: 'relationship',
+              relationTo: 'services',
+              admin: { description: 'Куда ведёт строка таблицы.' },
+            },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'price', label: 'Цена', type: 'number', required: true, min: 0 },
+            {
+              name: 'unit',
+              label: 'Единица',
               type: 'select',
               required: true,
+              defaultValue: 'm2',
               options: [
-                { label: 'Квартира', value: 'apartment' },
-                { label: 'Дом', value: 'house' },
-                { label: 'Коммерческий', value: 'commercial' },
+                { label: '₽/м²', value: 'm2' },
+                { label: '₽/месяц', value: 'month' },
+                { label: '%', value: 'percent' },
               ],
             },
             {
-              name: 'pkg',
-              label: 'Пакет',
+              name: 'basis',
+              label: 'База для %',
+              type: 'text',
+              admin: {
+                condition: (_, row) => row?.unit === 'percent',
+                placeholder: 'от стоимости работ',
+              },
+            },
+            {
+              name: 'inFull',
+              label: 'В пакете FULL',
               type: 'select',
               required: true,
+              defaultValue: 'same',
               options: [
-                { label: 'Планировочный', value: 'planning' },
-                { label: 'Стандарт', value: 'standard' },
-                { label: 'Полный', value: 'full' },
+                { label: 'В подарок', value: 'gift' },
+                { label: 'По той же цене', value: 'same' },
               ],
             },
-            { name: 'rate', label: 'Ставка, ₽/м²', type: 'number', required: true, min: 0 },
           ],
         },
       ],
     },
     {
-      name: 'conditions',
-      label: 'Коэффициенты по состоянию',
-      type: 'array',
-      defaultValue: [
-        { name: 'Бетон', k: 1.1 },
-        { name: 'White box', k: 1 },
-        { name: 'Вторичка', k: 1.15 },
-      ],
+      type: 'row',
       fields: [
+        { name: 'fullTitle', label: 'Название пакета', type: 'text', defaultValue: 'FULL' },
         {
-          type: 'row',
-          fields: [
-            { name: 'name', label: 'Состояние', type: 'text', required: true },
-            { name: 'k', label: 'Коэффициент', type: 'number', required: true, min: 0.1, max: 5 },
-          ],
+          name: 'exampleArea',
+          label: 'Площадь для примера, м²',
+          type: 'number',
+          defaultValue: 100,
+          min: 1,
         },
       ],
+    },
+    {
+      name: 'fullLead',
+      label: 'Описание пакета',
+      type: 'textarea',
+      defaultValue:
+        'Полный комплекс услуг RED ONE: от первых замеров и разработки проекта до комплектации и ведения строительных работ. При заказе пакета FULL пять услуг — в подарок.',
+    },
+    {
+      name: 'team',
+      label: 'Кто отвечает за ремонт',
+      type: 'textarea',
+      defaultValue:
+        'За ваш ремонт отвечает команда: менеджер проекта, прораб и закупщик. Ведущий дизайнер сопровождает реализацию проектных решений в рамках авторского надзора.',
+    },
+    {
+      ...linesField('conditions', 'Условия пакета'),
+      defaultValue: [
+        'Комплектация оплачивается по ставке 10% от стоимости закупок.',
+        'Ведение строительных работ — 15% от стоимости работ, погрузки, выгрузки, подъёмов, логистики и уборок. Стоимость строительных материалов в базу расчёта не входит.',
+        'Строительные работы, материалы, мебель, техника и сопутствующие расходы оплачиваются отдельно по согласованным сметам.',
+        'Подарочные условия действуют при заказе полного комплекса услуг и фиксируются в договоре.',
+        'Гарантия на выполненные ремонтно-строительные работы — 5 лет. Условия гарантии закрепляются в договоре.',
+      ].join('\n'),
     },
   ],
 }
@@ -358,4 +433,4 @@ export const Integrations: GlobalConfig = {
   ],
 }
 
-export const globals = [Brand, Contacts, Menu, Quiz, SeoDefaults, Integrations]
+export const globals = [Brand, Contacts, Menu, Quiz, Pricing, SeoDefaults, Integrations]

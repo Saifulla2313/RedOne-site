@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import { formatPhone, phoneComplete, sendLead } from '@/lib/site/leads'
-import type { Quiz } from '@/lib/site/types'
+import { rates, rub } from '@/lib/site/pricing'
+import type { Pricing, Quiz } from '@/lib/site/types'
+import { AreaInput, Estimate } from './PriceCalculator'
 
-export function QuizForm({ quiz }: { quiz: Quiz }) {
+export function QuizForm({ quiz, pricing }: { quiz: Quiz; pricing?: Pricing }) {
   const { steps } = quiz
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string>>({})
+  const [area, setArea] = useState(pricing?.exampleArea ?? 100)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
@@ -22,20 +25,37 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
     if (current.kind === 'options' && !answers[step]) {
       setAnswers({ ...answers, [step]: current.options?.[0] ?? '' })
     }
+    if (current.kind === 'slider' && !area) return setHint('Укажите площадь')
+    setHint('')
     if (!last) return setStep(step + 1)
     if (!phoneComplete(phone)) return setHint('Введите номер полностью: 10 цифр после +7')
-    setHint('')
     setState('sending')
+    const r = pricing && rates(pricing)
+    const hasArea = steps.some((s) => s.kind === 'slider')
     try {
       await sendLead({
         type: 'quiz',
         name,
         phone: `+7 ${phone}`,
-        answers: Object.fromEntries(
-          steps
-            .filter((s) => s.kind !== 'contacts')
-            .map((s, i) => [s.q, answers[i] ?? s.options?.[0] ?? '']),
-        ),
+        answers: {
+          ...Object.fromEntries(
+            steps.flatMap((s, i) =>
+              s.kind === 'contacts'
+                ? []
+                : [
+                    [
+                      s.q,
+                      s.kind === 'slider' ? `${area} м²` : (answers[i] ?? s.options?.[0] ?? ''),
+                    ],
+                  ],
+            ),
+          ),
+          ...(r && hasArea
+            ? {
+                'Расчёт на сайте': `отдельно ${rub(r.separate * area)} ₽, в ${pricing.fullTitle} ${rub(r.full * area)} ₽`,
+              }
+            : {}),
+        },
       })
       setState('done')
     } catch {
@@ -51,6 +71,7 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
         aria-valuenow={Math.round(progress)}
         aria-valuemin={0}
         aria-valuemax={100}
+        aria-label="Прогресс квиза"
       >
         <i style={{ width: `${progress}%` }} />
       </div>
@@ -92,6 +113,13 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
                     Нажимая кнопку, вы соглашаетесь с{' '}
                     <a href="/politika">политикой конфиденциальности</a>
                   </p>
+                </>
+              ) : current.kind === 'slider' ? (
+                <>
+                  <AreaInput area={area} onChange={setArea} />
+                  {pricing && pricing.items.length > 0 && area > 0 && (
+                    <Estimate pricing={pricing} area={area} />
+                  )}
                 </>
               ) : (
                 current.options?.map((o, i) => (

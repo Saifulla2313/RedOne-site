@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { QuizForm } from '@/components/site/QuizForm'
-import { getQuiz } from '@/lib/site/data'
+import { getPricing, getQuiz } from '@/lib/site/data'
+import '../pricing.css'
 
 export const metadata: Metadata = {
   title: 'Расчёт стоимости дизайн-проекта',
@@ -8,10 +9,10 @@ export const metadata: Metadata = {
 }
 
 export default async function QuizPage() {
-  const quiz = await getQuiz()
+  const [quiz, pricing] = await Promise.all([getQuiz(), getPricing()])
   return (
     <main>
-      <QuizForm quiz={quiz} />
+      <QuizForm quiz={quiz} pricing={pricing} />
     </main>
   )
 }
