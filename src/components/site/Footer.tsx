@@ -9,16 +9,16 @@ export function Footer({ contacts }: { contacts: Contacts }) {
       <div className="cols">
         {[office1, office2].filter(Boolean).map((o) => (
           <div key={o.city}>
-            <h5>{o.city}</h5>
+            <p className="fh">{o.city}</p>
             <p>{o.address}</p>
             {o.hours && <p>{o.hours}</p>}
           </div>
         ))}
         <div>
           {phone && (
-            <h5>
+            <p className="fh">
               <a href={`tel:${phone.replace(/[^\d+]/g, '')}`}>{phone}</a>
-            </h5>
+            </p>
           )}
           <p className="lbl">Свяжитесь с нами:</p>
           <Link className="btn s" href="/kviz">
@@ -26,9 +26,9 @@ export function Footer({ contacts }: { contacts: Contacts }) {
           </Link>
         </div>
         <div>
-          <h5>
+          <p className="fh">
             <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
-          </h5>
+          </p>
           <p className="lbl">Соцсети</p>
           <div className="soc">
             {contacts.socials.map((s) => (
