@@ -35,7 +35,11 @@ export function Reveal() {
     return () => {
       io.disconnect()
       mo.disconnect()
-      document.querySelectorAll('.rv.pre').forEach((el) => el.classList.remove('pre'))
+      // снимаем и метку, иначе повторный запуск эффекта (StrictMode) пропустит эти блоки и они не анимируются
+      document.querySelectorAll<HTMLElement>('.rv.pre').forEach((el) => {
+        el.classList.remove('pre')
+        delete el.dataset.rv
+      })
     }
   }, [])
 
