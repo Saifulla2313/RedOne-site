@@ -1,5 +1,6 @@
 // Заглушки с формой данных сайта. Используются только в разработке,
 // пока в админке пусто или база недоступна (см. data.ts).
+import { pricing, services as priceServices, toLexical } from './price-list'
 import type {
   Brand,
   Category,
@@ -79,6 +80,7 @@ const services: Service[] = [
     title: 'Дизайн интерьера',
     priceFrom: 0,
     cover: null,
+    faq: [],
     packages: [
       {
         name: 'Пакет 1',
@@ -153,12 +155,31 @@ const services: Service[] = [
   },
 ]
 
+const allServices: Service[] = [
+  ...services,
+  ...priceServices.map((s) => ({
+    slug: s.slug,
+    title: s.title,
+    priceFrom: s.priceFrom,
+    offer: s.offer,
+    body: toLexical(s.body),
+    packages: [],
+    scope: [],
+    faq: s.faq,
+    seo: s.seo,
+  })),
+]
+
 export async function getService(slug: string) {
-  return services.find((s) => s.slug === slug) ?? null
+  return allServices.find((s) => s.slug === slug) ?? null
 }
 
 export async function getServices() {
-  return services
+  return allServices
+}
+
+export async function getPricing() {
+  return pricing
 }
 
 export async function getBrand(): Promise<Brand> {
@@ -201,34 +222,35 @@ export async function getMenu(): Promise<MenuItem[]> {
     { label: 'Интерьеры', link: '/proekty?category=interiors' },
     { label: 'Архитектура', link: '/proekty?category=architecture' },
     { label: 'Общественные интерьеры', link: '/proekty?category=public' },
-    { label: 'Услуги', link: '/uslugi/dizayn-interera' },
+    { label: 'Услуги и цены', link: '/ceny' },
     { label: 'Блог', link: '/blog' },
   ]
 }
 
 export async function getQuiz(): Promise<Quiz> {
   return {
-    intro: 'Ответьте на 4 вопроса и получите расчёт стоимости и подборку материалов в подарок',
+    intro: 'Ответьте на 4 вопроса и сразу увидите стоимость проекта для вашей площади',
     steps: [
       {
         q: 'Какой объект нужно спроектировать?',
         kind: 'options',
         options: ['Квартира', 'Дом', 'Коммерческое помещение'],
       },
-      {
-        q: 'Площадь объекта',
-        kind: 'options',
-        options: ['До 80 m²', '80–150 m²', '150–300 m²', 'Больше 300 m²'],
-      },
+      { q: 'Площадь объекта', kind: 'slider' },
       {
         q: 'Когда планируете начать?',
         kind: 'options',
         options: ['В ближайший месяц', 'Через 1–3 месяца', 'Пока присматриваюсь'],
       },
       {
-        q: 'Какой пакет интересен?',
+        q: 'Что нужно?',
         kind: 'options',
-        options: ['Пакет 1', 'Пакет 2', 'Пакет 3', 'Нужна консультация'],
+        options: [
+          'Пакет FULL: проект и ремонт под ключ',
+          'Только дизайн-проект',
+          'Отдельные услуги',
+          'Нужна консультация',
+        ],
       },
       { q: 'Куда отправить расчёт?', kind: 'contacts' },
     ],

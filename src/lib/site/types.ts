@@ -1,5 +1,6 @@
 // Типы публичной части. Повторяют схему админки (/mnt/project-files/max-site/admin-schema.md),
 // но только поля, которые нужны страницам сайта.
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 
 export type Media = {
   url: string
@@ -57,10 +58,35 @@ export type Service = {
   slug: string
   title: string
   priceFrom: number
+  offer?: string
+  term?: string
   cover?: Media
+  // Lexical JSON из админки
+  body?: SerializedEditorState | null
   packages: Package[]
   scope: { label: string; items: string[] }[]
+  faq: { q: string; a: string }[]
   seo?: Seo
+}
+
+export type PriceUnit = 'm2' | 'month' | 'percent'
+
+export type PriceItem = {
+  title: string
+  price: number
+  unit: PriceUnit
+  basis?: string
+  inFull: 'gift' | 'same'
+  slug?: string
+}
+
+export type Pricing = {
+  items: PriceItem[]
+  fullTitle: string
+  exampleArea: number
+  fullLead: string
+  team: string
+  conditions: string[]
 }
 
 export type Brand = {

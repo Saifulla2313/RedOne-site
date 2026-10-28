@@ -1,9 +1,6 @@
-import { notFound, redirect } from 'next/navigation'
-import { getServices } from '@/lib/site/data'
+import { redirect } from 'next/navigation'
 
-// Отдельного списка услуг пока нет: ведём на первую услугу
-export default async function ServicesIndex() {
-  const [first] = await getServices()
-  if (!first) notFound()
-  redirect(`/uslugi/${first.slug}`)
+// Общая страница услуг — прайс на /ceny, отдельные услуги на /uslugi/{slug}
+export default function ServicesIndex() {
+  redirect('/ceny')
 }

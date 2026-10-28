@@ -11,6 +11,8 @@ import type {
   Contacts,
   Media,
   MenuItem,
+  PriceItem,
+  Pricing,
   Project,
   ProjectStatus,
   Quiz,
@@ -89,7 +91,10 @@ const toService = (s: PService): Service => ({
   slug: s.slug ?? String(s.id),
   title: s.title,
   priceFrom: s.priceFrom,
+  offer: s.offer ?? undefined,
+  term: s.term ?? undefined,
   cover: media(s.cover, 'card'),
+  body: s.body ?? null,
   packages: (s.packages ?? []).map((p) => ({
     name: p.name,
     price: p.priceFrom ?? undefined,
@@ -97,6 +102,7 @@ const toService = (s: PService): Service => ({
     media: media(p.media, 'card'),
   })),
   scope: (s.scope ?? []).map((r) => ({ label: r.label, items: lines(r.items) })),
+  faq: (s.faq ?? []).map((f) => ({ q: f.q, a: f.a })),
   seo: s.seo
     ? { title: s.seo.title ?? undefined, description: s.seo.description ?? undefined }
     : undefined,
@@ -278,6 +284,33 @@ export async function getContacts(): Promise<Contacts> {
     },
     async () => fb,
     () => false,
+  )
+}
+
+export async function getPricing(): Promise<Pricing> {
+  return withFallback(
+    async () => {
+      const p = await (
+        await payload()
+      ).findGlobal({ slug: 'pricing', overrideAccess: false, depth: 1 })
+      return {
+        items: (p.items ?? []).map((i): PriceItem => ({
+          title: i.title,
+          price: i.price,
+          unit: i.unit,
+          basis: i.basis ?? undefined,
+          inFull: i.inFull,
+          slug: typeof i.service === 'object' ? (i.service?.slug ?? undefined) : undefined,
+        })),
+        fullTitle: p.fullTitle || 'FULL',
+        exampleArea: p.exampleArea || 100,
+        fullLead: p.fullLead ?? '',
+        team: p.team ?? '',
+        conditions: lines(p.conditions),
+      }
+    },
+    placeholder.getPricing,
+    (v) => v.items.length === 0,
   )
 }
 

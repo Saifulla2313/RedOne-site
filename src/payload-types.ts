@@ -112,6 +112,7 @@ export interface Config {
     contacts: Contact;
     menu: Menu;
     quiz: Quiz;
+    pricing: Pricing;
     'seo-defaults': SeoDefault;
     integrations: Integration;
   };
@@ -120,6 +121,7 @@ export interface Config {
     contacts: ContactsSelect<false> | ContactsSelect<true>;
     menu: MenuSelect<false> | MenuSelect<true>;
     quiz: QuizSelect<false> | QuizSelect<true>;
+    pricing: PricingSelect<false> | PricingSelect<true>;
     'seo-defaults': SeoDefaultsSelect<false> | SeoDefaultsSelect<true>;
     integrations: IntegrationsSelect<false> | IntegrationsSelect<true>;
   };
@@ -1530,7 +1532,7 @@ export interface Menu {
   createdAt?: string | null;
 }
 /**
- * Шаги квиза и ставки, из которых сайт считает вилку цены: ставка × площадь × коэффициент, −10% / +15%.
+ * Шаги квиза. Расчёт стоимости на шаге «Ползунок площади» сайт берёт из «Прайса».
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "quiz".
@@ -1549,21 +1551,39 @@ export interface Quiz {
       }[]
     | null;
   finalText?: string | null;
-  rates?:
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Таблица цен на /ceny, пакет FULL и калькулятор в квизе. Считаются только строки в ₽/м².
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing".
+ */
+export interface Pricing {
+  id: number;
+  items?:
     | {
-        objectType: 'apartment' | 'house' | 'commercial';
-        pkg: 'planning' | 'standard' | 'full';
-        rate: number;
+        title: string;
+        /**
+         * Куда ведёт строка таблицы.
+         */
+        service?: (number | null) | Service;
+        price: number;
+        unit: 'm2' | 'month' | 'percent';
+        basis?: string | null;
+        inFull: 'gift' | 'same';
         id?: string | null;
       }[]
     | null;
-  conditions?:
-    | {
-        name: string;
-        k: number;
-        id?: string | null;
-      }[]
-    | null;
+  fullTitle?: string | null;
+  exampleArea?: number | null;
+  fullLead?: string | null;
+  team?: string | null;
+  /**
+   * Каждый пункт с новой строки.
+   */
+  conditions?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1699,21 +1719,31 @@ export interface QuizSelect<T extends boolean = true> {
         id?: T;
       };
   finalText?: T;
-  rates?:
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing_select".
+ */
+export interface PricingSelect<T extends boolean = true> {
+  items?:
     | T
     | {
-        objectType?: T;
-        pkg?: T;
-        rate?: T;
+        title?: T;
+        service?: T;
+        price?: T;
+        unit?: T;
+        basis?: T;
+        inFull?: T;
         id?: T;
       };
-  conditions?:
-    | T
-    | {
-        name?: T;
-        k?: T;
-        id?: T;
-      };
+  fullTitle?: T;
+  exampleArea?: T;
+  fullLead?: T;
+  team?: T;
+  conditions?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
