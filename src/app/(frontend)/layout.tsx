@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
-import { Suspense } from 'react'
 import { CookieBar } from '@/components/site/CookieBar'
 import { Footer } from '@/components/site/Footer'
 import { Header } from '@/components/site/Header'
@@ -34,9 +33,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <OfficeSection photos={brand.officeSlider} />
         <Footer contacts={contacts} />
         <CookieBar />
-        <Suspense>
-          <Reveal />
-        </Suspense>
+        <Reveal />
       </body>
     </html>
   )
