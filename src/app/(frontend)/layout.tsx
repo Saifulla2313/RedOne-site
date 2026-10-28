@@ -16,6 +16,9 @@ const montserrat = Montserrat({
   display: 'swap',
 })
 
+// Данные меняются в админке, поэтому страницы собираются на каждый запрос (кэш: техдолг #11)
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: { default: 'RedONE — дизайн интерьера и архитектура', template: '%s — RedONE' },
   description: '[Описание бюро для поиска: услуги, города, опыт.]',
