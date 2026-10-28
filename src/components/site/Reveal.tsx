@@ -1,14 +1,13 @@
 'use client'
 
-import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 
 // Появление блоков при прокрутке (аналог fadeinup в Tilda).
 // Прячем только то, что ниже экрана, поэтому первый экран виден сразу и без JS.
+// Один наблюдатель на всё время жизни страницы: новые блоки после переходов ловит MutationObserver.
+// Если пересоздавать его на каждый переход, старый успевал пометить блоки новой страницы
+// и отключался, и они оставались невидимыми до перезагрузки.
 export function Reveal() {
-  const pathname = usePathname()
-  const search = useSearchParams()
-
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const io = new IntersectionObserver(
@@ -36,8 +35,9 @@ export function Reveal() {
     return () => {
       io.disconnect()
       mo.disconnect()
+      document.querySelectorAll('.rv.pre').forEach((el) => el.classList.remove('pre'))
     }
-  }, [pathname, search])
+  }, [])
 
   return null
 }
