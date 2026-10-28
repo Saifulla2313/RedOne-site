@@ -4,7 +4,11 @@ import { FeaturedProjects } from '@/components/site/FeaturedProjects'
 import { Photo } from '@/components/site/Photo'
 import { getBrand, getFeaturedProjects } from '@/lib/site/data'
 
-const ctaHref = { quiz: '/kviz', excursion: '#excursion', prices: '/uslugi/dizayn-interera' } as const
+const ctaHref = {
+  quiz: '/kviz',
+  excursion: '#excursion',
+  prices: '/uslugi/dizayn-interera',
+} as const
 
 const directions = [
   { title: 'Дизайн интерьера', href: '/proekty?category=interiors', tone: 2 },
@@ -19,9 +23,23 @@ export default async function HomePage() {
     <main>
       <section className="hero">
         {brand.heroVideo?.url ? (
-          <video className="hero-bg" src={brand.heroVideo.url} poster={brand.heroVideo.poster?.url} autoPlay muted loop playsInline preload="metadata" />
+          <video
+            className="hero-bg"
+            src={brand.heroVideo.url}
+            poster={brand.heroVideo.poster?.url}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
         ) : (
-          <Photo media={null} tone={2} className="hero-bg" label="фоновое видео: ваш интерьер, 10–15 с" />
+          <Photo
+            media={null}
+            tone={2}
+            className="hero-bg"
+            label="фоновое видео: ваш интерьер, 10–15 с"
+          />
         )}
         <h1>{brand.slogan}</h1>
         <div className="hero-cta">
@@ -36,7 +54,13 @@ export default async function HomePage() {
       <FeaturedProjects projects={featured} />
 
       <section className="team rv">
-        <Photo media={brand.teamPhoto} tone={5} className="bw" sizes="100vw" label="общее фото команды, ч/б" />
+        <Photo
+          media={brand.teamPhoto}
+          tone={5}
+          className="bw"
+          sizes="100vw"
+          label="общее фото команды, ч/б"
+        />
         <div className="stats">
           {brand.stats.map((s) => (
             <div key={s.label}>

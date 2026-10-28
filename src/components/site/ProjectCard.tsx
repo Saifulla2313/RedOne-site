@@ -6,7 +6,12 @@ import { Photo } from './Photo'
 export function ProjectCard({ project, index = 0 }: { project: Project; index?: number }) {
   return (
     <Link className="card rv" href={projectHref(project.slug)}>
-      <Photo media={project.cover} tone={index + 1} sizes="(max-width: 900px) 100vw, 50vw" label="фото проекта" />
+      <Photo
+        media={project.cover}
+        tone={index + 1}
+        sizes="(max-width: 900px) 100vw, 50vw"
+        label="фото проекта"
+      />
       <div className="t">
         <h3>{project.title}</h3>
         <p>{projectMeta(project)}</p>

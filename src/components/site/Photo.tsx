@@ -12,7 +12,15 @@ type Props = {
   children?: React.ReactNode
 }
 
-export function Photo({ media, className = '', sizes = '100vw', priority, tone = 1, label, children }: Props) {
+export function Photo({
+  media,
+  className = '',
+  sizes = '100vw',
+  priority,
+  tone = 1,
+  label,
+  children,
+}: Props) {
   if (media?.url) {
     return (
       <div className={`ph ${className}`}>
@@ -22,7 +30,12 @@ export function Photo({ media, className = '', sizes = '100vw', priority, tone =
     )
   }
   return (
-    <div className={`ph p${((tone - 1) % 6) + 1} ${className}`} data-l={label} role="img" aria-label={label ?? 'Фото'}>
+    <div
+      className={`ph p${((tone - 1) % 6) + 1} ${className}`}
+      data-l={label}
+      role="img"
+      aria-label={label ?? 'Фото'}
+    >
       {children}
     </div>
   )

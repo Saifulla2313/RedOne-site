@@ -14,10 +14,17 @@ const tabs: { key: ProjectStatus | 'all'; label: string }[] = [
   { key: 'all', label: 'Все проекты' },
 ]
 
-export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Search
+}): Promise<Metadata> {
   const { category } = await searchParams
   const title = isCategory(category) ? categoryTitle[category] : 'Портфолио'
-  return { title, alternates: { canonical: isCategory(category) ? `/proekty?category=${category}` : '/proekty' } }
+  return {
+    title,
+    alternates: { canonical: isCategory(category) ? `/proekty?category=${category}` : '/proekty' },
+  }
 }
 
 export default async function CatalogPage({ searchParams }: { searchParams: Search }) {
@@ -39,7 +46,13 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
       <h1 className="big-h cat-h">{category ? categoryTitle[category] : 'Портфолио'}</h1>
       <nav className="tabs" aria-label="Статус проектов">
         {tabs.map((t) => (
-          <Link key={t.key} href={href(t.key)} className={t.key === status ? 'on' : ''} aria-current={t.key === status ? 'page' : undefined} scroll={false}>
+          <Link
+            key={t.key}
+            href={href(t.key)}
+            className={t.key === status ? 'on' : ''}
+            aria-current={t.key === status ? 'page' : undefined}
+            scroll={false}
+          >
             {t.label}
           </Link>
         ))}

@@ -21,7 +21,14 @@ export function OfficeSection({ photos }: { photos: Media[] }) {
         </button>
         <div className="track" ref={track}>
           {photos.map((m, i) => (
-            <Photo key={i} media={m} tone={[6, 4, 2][i % 3]} className={i % 2 ? 'sm' : ''} sizes="76vw" label="офис" />
+            <Photo
+              key={i}
+              media={m}
+              tone={[6, 4, 2][i % 3]}
+              className={i % 2 ? 'sm' : ''}
+              sizes="76vw"
+              label="офис"
+            />
           ))}
         </div>
         <button className="arr r" aria-label="Вперёд" onClick={() => scroll(1)}>

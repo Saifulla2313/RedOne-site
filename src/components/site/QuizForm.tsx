@@ -31,7 +31,11 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
         type: 'quiz',
         name,
         phone: `+7 ${phone}`,
-        answers: Object.fromEntries(steps.filter((s) => s.kind !== 'contacts').map((s, i) => [s.q, answers[i] ?? s.options?.[0] ?? ''])),
+        answers: Object.fromEntries(
+          steps
+            .filter((s) => s.kind !== 'contacts')
+            .map((s, i) => [s.q, answers[i] ?? s.options?.[0] ?? '']),
+        ),
       })
       setState('done')
     } catch {
@@ -41,7 +45,13 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
 
   return (
     <form className="quiz wrap" onSubmit={next} noValidate>
-      <div className="bar" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
+      <div
+        className="bar"
+        role="progressbar"
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
         <i style={{ width: `${progress}%` }} />
       </div>
       <p className="q-sub">{quiz.intro}</p>
@@ -58,7 +68,14 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
             <div className="opts">
               {current.kind === 'contacts' ? (
                 <>
-                  <input className="q-in" placeholder="Имя" autoComplete="name" aria-label="Имя" value={name} onChange={(e) => setName(e.target.value)} />
+                  <input
+                    className="q-in"
+                    placeholder="Имя"
+                    autoComplete="name"
+                    aria-label="Имя"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                   <div className="q-in tel">
                     <span>+7</span>
                     <input
@@ -72,7 +89,8 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
                     />
                   </div>
                   <p className="agree-note">
-                    Нажимая кнопку, вы соглашаетесь с <a href="/politika">политикой конфиденциальности</a>
+                    Нажимая кнопку, вы соглашаетесь с{' '}
+                    <a href="/politika">политикой конфиденциальности</a>
                   </p>
                 </>
               ) : (
@@ -102,7 +120,13 @@ export function QuizForm({ quiz }: { quiz: Quiz }) {
               Шаг {step + 1}/{steps.length}
             </span>
             <div className="nav">
-              <button type="button" className="back" aria-label="Назад" onClick={() => setStep(step - 1)} style={{ visibility: step ? 'visible' : 'hidden' }}>
+              <button
+                type="button"
+                className="back"
+                aria-label="Назад"
+                onClick={() => setStep(step - 1)}
+                style={{ visibility: step ? 'visible' : 'hidden' }}
+              >
                 ←
               </button>
               <button className="btn l" disabled={state === 'sending'}>

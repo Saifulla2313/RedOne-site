@@ -2,13 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import { useState } from 'react'
 import type { Media, MenuItem } from '@/lib/site/types'
 
 export function Header({ menu, logo }: { menu: MenuItem[]; logo: Media }) {
-  const [open, setOpen] = useState(false)
   const pathname = usePathname()
-  useEffect(() => setOpen(false), [pathname])
+  // меню открыто только на той странице, где его открыли: переход по ссылке его закрывает
+  const [openOn, setOpenOn] = useState<string | null>(null)
+  const open = openOn === pathname
 
   return (
     <>
@@ -21,7 +23,18 @@ export function Header({ menu, logo }: { menu: MenuItem[]; logo: Media }) {
           ))}
         </nav>
         <Link className="logo" href="/" aria-label="RedONE, на главную">
-          {logo?.url ? <img src={logo.url} alt={logo.alt} height={18} /> : 'RedONE'}
+          {logo?.url ? (
+            <Image
+              src={logo.url}
+              alt={logo.alt}
+              width={logo.width ?? 120}
+              height={logo.height ?? 18}
+              style={{ height: 18, width: 'auto' }}
+              priority
+            />
+          ) : (
+            'RedONE'
+          )}
         </Link>
         <div className="r">
           <Link className="btn s" href="/kviz">
@@ -30,7 +43,12 @@ export function Header({ menu, logo }: { menu: MenuItem[]; logo: Media }) {
           <Link className="hide-m" href="/#office">
             Офис
           </Link>
-          <button className="burger" aria-label="Меню" aria-expanded={open} onClick={() => setOpen(!open)}>
+          <button
+            className="burger"
+            aria-label="Меню"
+            aria-expanded={open}
+            onClick={() => setOpenOn(open ? null : pathname)}
+          >
             <i />
             <i />
             <i />

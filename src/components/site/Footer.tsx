@@ -32,7 +32,13 @@ export function Footer({ contacts }: { contacts: Contacts }) {
           <p className="lbl">Соцсети</p>
           <div className="soc">
             {contacts.socials.map((s) => (
-              <a key={s.name} href={s.url} target="_blank" rel="noopener noreferrer" aria-label={s.name}>
+              <a
+                key={s.name}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.name}
+              >
                 {s.name}
               </a>
             ))}

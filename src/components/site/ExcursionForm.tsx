@@ -69,7 +69,12 @@ export function ExcursionForm({ media }: { media?: Media }) {
           </div>
         )}
       </div>
-      <Photo media={media} tone={1} sizes="(max-width: 900px) 100vw, 455px" label="видео: прогулка по объекту" />
+      <Photo
+        media={media}
+        tone={1}
+        sizes="(max-width: 900px) 100vw, 455px"
+        label="видео: прогулка по объекту"
+      />
     </form>
   )
 }

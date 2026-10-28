@@ -43,7 +43,13 @@ function Section({ s, index }: { s: ProjectSection; index: number }) {
       )}
       <div className={`pj-${s.layout} wrap rv`}>
         {s.photos.map((m, i) => (
-          <Photo key={i} media={m} tone={index + i + 1} sizes={sizes[s.layout]} label={s.title?.toLowerCase()} />
+          <Photo
+            key={i}
+            media={m}
+            tone={index + i + 1}
+            sizes={sizes[s.layout]}
+            label={s.title?.toLowerCase()}
+          />
         ))}
       </div>
     </>

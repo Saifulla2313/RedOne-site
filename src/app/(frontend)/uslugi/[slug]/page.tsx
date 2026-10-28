@@ -53,7 +53,12 @@ export default async function ServicePage({ params }: { params: Params }) {
           {head.map((p) => (
             <PackCard key={p.name} p={p} />
           ))}
-          <Photo media={media} tone={4} sizes="(max-width: 900px) 100vw, 25vw" label="фото / видео" />
+          <Photo
+            media={media}
+            tone={4}
+            sizes="(max-width: 900px) 100vw, 25vw"
+            label="фото / видео"
+          />
           {tail && <PackCard p={tail} />}
         </div>
       </section>

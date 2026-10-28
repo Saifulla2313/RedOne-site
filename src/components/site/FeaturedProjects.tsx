@@ -22,7 +22,12 @@ export function FeaturedProjects({ projects }: { projects: Project[] }) {
       {pages > 1 && (
         <nav className="pager" aria-label="Страницы">
           {Array.from({ length: pages }, (_, i) => (
-            <button key={i} className={i === page ? 'on' : ''} aria-current={i === page} onClick={() => setPage(i)}>
+            <button
+              key={i}
+              className={i === page ? 'on' : ''}
+              aria-current={i === page}
+              onClick={() => setPage(i)}
+            >
               {i + 1}
             </button>
           ))}

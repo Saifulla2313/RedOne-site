@@ -7,16 +7,22 @@ export type LeadPayload = {
   answers?: Record<string, string>
 }
 
-// Эндпоинт приёма заявок делает каркас админки (коллекция leads).
-// Отсюда уходят тип, контакты, ответы, страница и UTM-метки.
+// Приём заявок: src/endpoints/submitLead.ts (POST /api/leads/submit, ответ 201 или 400 {error}).
+// website — поле-ловушка для ботов, люди его не видят, поэтому всегда пустое.
 export async function sendLead(payload: LeadPayload) {
   const utm = Object.fromEntries(
     [...new URLSearchParams(window.location.search)].filter(([k]) => k.startsWith('utm_')),
   )
-  const res = await fetch('/api/leads', {
+  const res = await fetch('/api/leads/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...payload, sourcePage: window.location.pathname, utm }),
+    body: JSON.stringify({
+      ...payload,
+      channel: 'phone',
+      sourcePage: window.location.pathname,
+      utm,
+      website: '',
+    }),
   })
   if (!res.ok) throw new Error(`lead ${res.status}`)
 }
