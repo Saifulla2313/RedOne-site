@@ -222,7 +222,8 @@ export async function getMenu(): Promise<MenuItem[]> {
     { label: 'Интерьеры', link: '/proekty?category=interiors' },
     { label: 'Архитектура', link: '/proekty?category=architecture' },
     { label: 'Общественные интерьеры', link: '/proekty?category=public' },
-    { label: 'Услуги и цены', link: '/ceny' },
+    { label: 'Услуги', link: '/uslugi' },
+    { label: 'Цены', link: '/ceny' },
     { label: 'Блог', link: '/blog' },
   ]
 }
