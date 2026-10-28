@@ -7,7 +7,7 @@ import { getBrand, getFeaturedProjects } from '@/lib/site/data'
 const ctaHref = {
   quiz: '/kviz',
   excursion: '#excursion',
-  prices: '/uslugi/dizayn-interera',
+  prices: '/ceny',
 } as const
 
 const directions = [
