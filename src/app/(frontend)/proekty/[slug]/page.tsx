@@ -4,15 +4,11 @@ import { Fragment } from 'react'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
 import { Photo } from '@/components/site/Photo'
 import { VideoBlock } from '@/components/site/VideoBlock'
-import { getProject, getProjects } from '@/lib/site/data'
+import { getProject } from '@/lib/site/data'
 import { projectMeta } from '@/lib/site/format'
 import type { ProjectSection } from '@/lib/site/types'
 
 type Params = Promise<{ slug: string }>
-
-export async function generateStaticParams() {
-  return (await getProjects()).map((p) => ({ slug: p.slug }))
-}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const p = await getProject((await params).slug)

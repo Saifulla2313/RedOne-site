@@ -3,14 +3,10 @@ import { notFound } from 'next/navigation'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
 import { Photo } from '@/components/site/Photo'
 import { ProjectGrid } from '@/components/site/ProjectCard'
-import { getFeaturedProjects, getService, getServices } from '@/lib/site/data'
+import { getFeaturedProjects, getService } from '@/lib/site/data'
 import type { Package } from '@/lib/site/types'
 
 type Params = Promise<{ slug: string }>
-
-export async function generateStaticParams() {
-  return (await getServices()).map((s) => ({ slug: s.slug }))
-}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const s = await getService((await params).slug)

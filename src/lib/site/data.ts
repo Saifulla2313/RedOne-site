@@ -1,11 +1,15 @@
-// Источник данных для публичных страниц.
-// Пока админка (Payload) не в main, функции отдают заглушки с той же формой данных.
-// Когда каркас появится, тела функций заменяются на запросы через Payload Local API,
-// а сигнатуры остаются прежними (техдолг #6).
+// Источник данных для публичных страниц: Payload Local API.
+// Читаем с overrideAccess: false, поэтому сайт видит только опубликованное (access.publishedOrStaff).
+// В разработке, пока в админке пусто или база не поднята, страницы показывают заглушки из placeholder.ts.
+import config from '@payload-config'
+import { getPayload } from 'payload'
+import type { Media as PMedia, Project as PProject, Service as PService } from '@/payload-types'
+import * as placeholder from './placeholder'
 import type {
   Brand,
   Category,
   Contacts,
+  Media,
   MenuItem,
   Project,
   ProjectStatus,
@@ -13,227 +17,303 @@ import type {
   Service,
 } from './types'
 
-const placeholderSections: Project['sections'] = [
-  { layout: 'full', photos: [null] },
-  { layout: 'full', photos: [null] },
-  {
-    title: 'Мастер-спальня',
-    layout: 'vertical',
-    text: '[1–2 предложения о помещении: материалы, свет, хранение.]',
-    photos: [null],
-  },
-  { layout: 'cols3', photos: [null, null, null] },
-  { title: 'Детская', layout: 'full', photos: [null] },
-  { layout: 'cols2', photos: [null, null] },
-  { title: 'Прихожая', layout: 'cols2', photos: [null, null] },
-]
+const dev = process.env.NODE_ENV !== 'production'
 
-const raw: [string, string, number, Project['city'], number, ProjectStatus, Category][] = [
-  ['penthouse', 'Пентхаус — [название]', 2026, 'moscow', 140, 'done', 'interiors'],
-  ['zhk-1', '[Название ЖК]', 2026, 'moscow', 200, 'done', 'interiors'],
-  ['zhk-2', '[Название ЖК]', 2026, 'other', 130, 'wip', 'interiors'],
-  ['zhk-3', 'ЖК «[Название]»', 2026, 'moscow', 290, 'wip', 'interiors'],
-  ['ulica-1', '[Улица]', 2026, 'spb', 220, 'done', 'interiors'],
-  ['dom-1', 'Дом в [посёлок]', 2025, 'spb', 1200, 'done', 'architecture'],
-  ['zhk-127', '[Название ЖК] 127', 2025, 'moscow', 127, 'done', 'interiors'],
-  ['zhk-97', '[Название ЖК] 97', 2025, 'moscow', 97, 'done', 'interiors'],
-  ['ulica-2', '[Улица]', 2025, 'moscow', 115, 'wip', 'interiors'],
-  ['restoran-1', 'Ресторан «[Название]»', 2024, 'moscow', 310, 'done', 'public'],
-]
+const payload = () => getPayload({ config })
 
-const projects: Project[] = raw.map(([slug, title, year, city, area, status, category], i) => ({
-  slug,
-  title,
-  year,
-  city,
-  area,
-  status,
-  category,
-  type: category === 'architecture' ? 'house' : category === 'public' ? 'commercial' : 'apartment',
-  cover: null,
-  hero: null,
-  excerpt:
-    '[2–4 предложения о проекте: кто заказчик, какая была задача, какое ключевое решение. Свой текст, 300–500 знаков, с городом и типом объекта для поиска.]',
-  videoUrl: i === 0 ? 'placeholder' : undefined,
-  sections: placeholderSections,
-  featured: i < 6,
-  order: i,
-}))
-
-export async function getProjects(filter: { category?: Category; status?: ProjectStatus } = {}) {
-  return projects
-    .filter((p) => !filter.category || p.category === filter.category)
-    .filter((p) => !filter.status || p.status === filter.status)
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+// В проде ошибку базы не прячем, в разработке подменяем заглушкой
+async function withFallback<T>(
+  load: () => Promise<T>,
+  fallback: () => Promise<T>,
+  empty: (v: T) => boolean,
+) {
+  try {
+    const value = await load()
+    return dev && empty(value) ? fallback() : value
+  } catch (err) {
+    if (!dev) throw err
+    console.warn('[site] данные из админки недоступны, показываю заглушки:', (err as Error).message)
+    return fallback()
+  }
 }
 
-export async function getFeaturedProjects() {
-  return projects.filter((p) => p.featured)
+const media = (m: number | PMedia | null | undefined, size?: 'card' | 'wide'): Media => {
+  if (!m || typeof m === 'number' || !m.url) return null
+  const variant = size ? m.sizes?.[size] : undefined
+  return {
+    url: variant?.url ?? m.url,
+    alt: m.alt,
+    width: variant?.width ?? m.width ?? undefined,
+    height: variant?.height ?? m.height ?? undefined,
+  }
 }
 
-export async function getProject(slug: string) {
-  return projects.find((p) => p.slug === slug) ?? null
+const lines = (s: string | null | undefined) =>
+  (s ?? '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+
+const toProject = (p: PProject): Project => ({
+  slug: p.slug ?? String(p.id),
+  title: p.title,
+  cover: media(p.cover, 'card'),
+  hero: media(p.hero, 'wide'),
+  excerpt: p.excerpt ?? undefined,
+  videoUrl: p.videoUrl ?? undefined,
+  category: p.category,
+  type: p.type,
+  status: p.status,
+  area: p.area,
+  year: p.year ?? undefined,
+  city: p.city ?? 'other',
+  sections: (p.sections ?? []).map((s) => ({
+    title: s.title,
+    layout: s.layout,
+    text: s.text ?? undefined,
+    photos: (s.photos ?? []).map((m) => media(m, s.layout === 'full' ? 'wide' : 'card')),
+  })),
+  featured: p.featured ?? false,
+  order: p.order ?? undefined,
+  seo: p.seo
+    ? {
+        title: p.seo.title ?? undefined,
+        description: p.seo.description ?? undefined,
+        ogImage: media(p.seo.ogImage),
+        noindex: p.seo.noindex ?? false,
+      }
+    : undefined,
+})
+
+const toService = (s: PService): Service => ({
+  slug: s.slug ?? String(s.id),
+  title: s.title,
+  priceFrom: s.priceFrom,
+  cover: media(s.cover, 'card'),
+  packages: (s.packages ?? []).map((p) => ({
+    name: p.name,
+    price: p.priceFrom ?? undefined,
+    items: lines(p.items),
+    media: media(p.media, 'card'),
+  })),
+  scope: (s.scope ?? []).map((r) => ({ label: r.label, items: lines(r.items) })),
+  seo: s.seo
+    ? { title: s.seo.title ?? undefined, description: s.seo.description ?? undefined }
+    : undefined,
+})
+
+const isEmpty = (v: unknown[]) => v.length === 0
+
+export function getProjects(filter: { category?: Category; status?: ProjectStatus } = {}) {
+  return withFallback(
+    async () => {
+      const res = await (
+        await payload()
+      ).find({
+        collection: 'projects',
+        overrideAccess: false,
+        depth: 1,
+        limit: 200,
+        sort: ['order', '-year'],
+        where: {
+          ...(filter.category ? { category: { equals: filter.category } } : {}),
+          ...(filter.status ? { status: { equals: filter.status } } : {}),
+        },
+      })
+      return res.docs.map(toProject)
+    },
+    () => placeholder.getProjects(filter),
+    isEmpty,
+  )
 }
 
-const services: Service[] = [
-  {
-    slug: 'dizayn-interera',
-    title: 'Дизайн интерьера',
-    priceFrom: 0,
-    cover: null,
-    packages: [
-      {
-        name: 'Пакет 1',
-        items: ['Обмеры помещения', 'Техническое задание', 'Планировочные решения', 'Визуализации'],
-      },
-      {
-        name: 'Пакет 2',
-        items: [
-          'Обмеры помещения',
-          'Техническое задание',
-          'Планировочные решения',
-          'Визуализации',
-          'Смета на отделку и мебель',
-          'Рабочие чертежи',
-        ],
-      },
-      {
-        name: 'Пакет 3',
-        items: [
-          'Обмеры помещения',
-          'Техническое задание',
-          'Планировочные решения',
-          'Визуализации',
-          'Полная смета',
-          'Рабочие чертежи',
-          'Инженерные разделы',
-          'Согласование с УК',
-        ],
-      },
-    ],
-    scope: [
-      {
-        label: 'Альбом проекта',
-        items: [
-          'Техническое задание',
-          'Обмерный план',
-          'Планировка с расстановкой мебели',
-          'Визуализации всех помещений',
-        ],
-      },
-      {
-        label: 'Смета на материалы и мебель',
-        items: [
-          'Отопление',
-          'Сантехника',
-          'Отделочные материалы',
-          'Бытовая техника',
-          'Мебель серийная',
-          'Мебель на заказ',
-          'Освещение',
-          'Двери и перегородки',
-          'Электрика',
-          'Декор',
-        ],
-      },
-      {
-        label: 'Чертежи',
-        items: [
-          'Пояснительная записка',
-          'Обмерный план',
-          'План демонтажа',
-          'План монтажа перегородок',
-          'План расстановки мебели',
-          'План потолков',
-          'План полов',
-          'План освещения',
-          'План розеток и выключателей',
-          'Развёртки стен',
-        ],
-      },
-    ],
-  },
-]
-
-export async function getService(slug: string) {
-  return services.find((s) => s.slug === slug) ?? null
+export function getFeaturedProjects() {
+  return withFallback(
+    async () => {
+      const res = await (
+        await payload()
+      ).find({
+        collection: 'projects',
+        overrideAccess: false,
+        depth: 1,
+        limit: 24,
+        sort: ['order', '-year'],
+        where: { featured: { equals: true } },
+      })
+      return res.docs.map(toProject)
+    },
+    placeholder.getFeaturedProjects,
+    isEmpty,
+  )
 }
 
-export async function getServices() {
-  return services
+export function getProject(slug: string) {
+  return withFallback(
+    async () => {
+      const res = await (
+        await payload()
+      ).find({
+        collection: 'projects',
+        overrideAccess: false,
+        depth: 1,
+        limit: 1,
+        where: { slug: { equals: slug } },
+      })
+      return res.docs[0] ? toProject(res.docs[0]) : null
+    },
+    () => placeholder.getProject(slug),
+    (v) => v === null,
+  )
 }
+
+export function getServices() {
+  return withFallback(
+    async () => {
+      const res = await (
+        await payload()
+      ).find({
+        collection: 'services',
+        overrideAccess: false,
+        depth: 1,
+        limit: 50,
+      })
+      return res.docs.map(toService)
+    },
+    placeholder.getServices,
+    isEmpty,
+  )
+}
+
+export function getService(slug: string) {
+  return withFallback(
+    async () => {
+      const res = await (
+        await payload()
+      ).find({
+        collection: 'services',
+        overrideAccess: false,
+        depth: 1,
+        limit: 1,
+        where: { slug: { equals: slug } },
+      })
+      return res.docs[0] ? toService(res.docs[0]) : null
+    },
+    () => placeholder.getService(slug),
+    (v) => v === null,
+  )
+}
+
+// Пустые поля глобалов добиваем заглушками только в разработке
+const orDev = <T>(value: T | null | undefined, fallback: T): T =>
+  value === null || value === undefined || value === '' || (Array.isArray(value) && !value.length)
+    ? dev
+      ? fallback
+      : (value ?? fallback)
+    : value
 
 export async function getBrand(): Promise<Brand> {
-  return {
-    logo: null,
-    heroVideo: null,
-    slogan: 'дизайн / архитектура',
-    heroCta: 'Рассчитаем стоимость проекта под вашу площадь',
-    heroCtaAction: 'quiz',
-    stats: [
-      { value: '[N] лет', label: 'Работаем с [год]' },
-      { value: '[N] человек', label: 'В команде архитекторов и дизайнеров' },
-      { value: '[N]+', label: 'Завершённых объектов' },
-      { value: '[N]', label: 'Объектов сейчас в работе' },
-    ],
-    teamPhoto: null,
-    officeSlider: [null, null, null],
-  }
+  const fb = await placeholder.getBrand()
+  return withFallback(
+    async () => {
+      const b = await (
+        await payload()
+      ).findGlobal({ slug: 'brand', overrideAccess: false, depth: 1 })
+      const video = media(b.heroVideo)
+      return {
+        logo: media(b.logo),
+        heroVideo: video ? { url: video.url, poster: media(b.heroPoster, 'wide') } : null,
+        slogan: orDev(b.slogan, fb.slogan),
+        heroCta: orDev(b.heroCta, fb.heroCta),
+        heroCtaAction: b.heroCtaAction ?? 'quiz',
+        stats: orDev(
+          b.stats?.map((s) => ({ value: s.value, label: s.label })),
+          fb.stats,
+        ),
+        teamPhoto: media(b.teamPhoto, 'wide'),
+        officeSlider: orDev(
+          b.officeSlider?.map((m) => media(m, 'wide')),
+          fb.officeSlider,
+        ),
+      }
+    },
+    async () => fb,
+    () => false,
+  )
 }
 
+const socialLabel = {
+  telegram: 'TG',
+  vk: 'VK',
+  youtube: 'YT',
+  dzen: 'Дзен',
+  pinterest: 'P',
+} as const
+
 export async function getContacts(): Promise<Contacts> {
-  return {
-    phones: [{ phone: '+7 (000) 000-00-00' }],
-    offices: [
-      { city: 'Москва', address: '[Улица, дом, офис]' },
-      { city: '[Второй город]', address: '[Улица, дом, офис]' },
-    ],
-    email: 'mail@[домен].ru',
-    socials: [
-      { name: 'VK', url: '#' },
-      { name: 'TG', url: '#' },
-    ],
-    company: '[Юрлицо]',
-    inn: '[номер]',
-  }
+  const fb = await placeholder.getContacts()
+  return withFallback(
+    async () => {
+      const c = await (await payload()).findGlobal({ slug: 'contacts', overrideAccess: false })
+      return {
+        phones: orDev(
+          c.phones?.map((p) => ({ label: p.label ?? undefined, phone: p.phone })),
+          fb.phones,
+        ),
+        offices: orDev(
+          c.offices?.map((o) => ({
+            city: o.city,
+            address: o.address,
+            hours: o.hours ?? undefined,
+          })),
+          fb.offices,
+        ),
+        email: orDev(c.email, fb.email),
+        socials: orDev(
+          c.socials?.map((s) => ({ name: socialLabel[s.network], url: s.url })),
+          fb.socials,
+        ),
+        company: orDev(c.company, fb.company),
+        inn: orDev(c.inn, fb.inn),
+      }
+    },
+    async () => fb,
+    () => false,
+  )
 }
 
 export async function getMenu(): Promise<MenuItem[]> {
-  return [
-    { label: 'Интерьеры', link: '/proekty?category=interiors' },
-    { label: 'Архитектура', link: '/proekty?category=architecture' },
-    { label: 'Общественные интерьеры', link: '/proekty?category=public' },
-    { label: 'Услуги', link: '/uslugi/dizayn-interera' },
-    { label: 'Блог', link: '/blog' },
-  ]
+  return withFallback(
+    async () => {
+      const m = await (await payload()).findGlobal({ slug: 'menu', overrideAccess: false })
+      return (m.items ?? []).map((i) => ({ label: i.label, link: i.link }))
+    },
+    placeholder.getMenu,
+    isEmpty,
+  )
 }
 
 export async function getQuiz(): Promise<Quiz> {
-  return {
-    intro: 'Ответьте на 4 вопроса и получите расчёт стоимости и подборку материалов в подарок',
-    steps: [
-      {
-        q: 'Какой объект нужно спроектировать?',
-        kind: 'options',
-        options: ['Квартира', 'Дом', 'Коммерческое помещение'],
-      },
-      {
-        q: 'Площадь объекта',
-        kind: 'options',
-        options: ['До 80 m²', '80–150 m²', '150–300 m²', 'Больше 300 m²'],
-      },
-      {
-        q: 'Когда планируете начать?',
-        kind: 'options',
-        options: ['В ближайший месяц', 'Через 1–3 месяца', 'Пока присматриваюсь'],
-      },
-      {
-        q: 'Какой пакет интересен?',
-        kind: 'options',
-        options: ['Пакет 1', 'Пакет 2', 'Пакет 3', 'Нужна консультация'],
-      },
-      { q: 'Куда отправить расчёт?', kind: 'contacts' },
-    ],
-    final: 'Расчёт пришлём в течение рабочего дня.',
-  }
+  const fb = await placeholder.getQuiz()
+  return withFallback(
+    async () => {
+      const q = await (await payload()).findGlobal({ slug: 'quiz', overrideAccess: false })
+      const steps = (q.steps ?? []).map((s) => ({
+        q: s.question,
+        kind: s.kind,
+        options: lines(s.options),
+      }))
+      return {
+        intro: fb.intro,
+        // без шага с контактами заявку не отправить, поэтому добавляем его сами
+        steps: steps.length
+          ? steps.some((s) => s.kind === 'contacts')
+            ? steps
+            : [...steps, { q: 'Куда отправить расчёт?', kind: 'contacts' as const }]
+          : fb.steps,
+        final: q.finalText || fb.final,
+      }
+    },
+    async () => fb,
+    () => false,
+  )
 }
