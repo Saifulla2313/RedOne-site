@@ -75,7 +75,7 @@ export default async function HomePage() {
         {directions.map((d) => (
           <Link key={d.title} className={`dir${d.tone ? '' : ' empty'}`} href={d.href}>
             <Photo media={null} tone={d.tone || 1} />
-            <h4>{d.title}</h4>
+            <h3>{d.title}</h3>
             <span className="go">Смотреть портфолио</span>
           </Link>
         ))}

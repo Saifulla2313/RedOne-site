@@ -5,7 +5,8 @@
   --bg2: #161616;
   --fg: #fff;
   --mute: #878787;
-  --dim: #3d3d3d;
+  --dim: #5e5e5e; /* крупные заголовки секций: контраст 3:1 на чёрном */
+  --soft: #7a7a7a; /* мелкий второстепенный текст: контраст 4.5:1 */
   --line: #222;
   --blue: #0071e3;
   --blue-h: #1a82f0;
@@ -337,7 +338,7 @@ body::before {
 .card .t {
   padding: 22px 40px 90px;
 }
-.card h3 {
+.card h2 {
   font-size: 24px;
   line-height: 1.35;
   font-weight: 600;
@@ -429,7 +430,7 @@ body::before {
   position: absolute;
   inset: 0;
 }
-.dir h4 {
+.dir h3 {
   position: absolute;
   left: 24px;
   top: 22px;
@@ -608,15 +609,16 @@ body::before {
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
-.ftr h5 {
+.ftr .fh {
   font-size: 20px;
   font-weight: 500;
+  color: var(--fg);
   margin: 0 0 10px;
 }
 .ftr p {
   font-size: 14px;
   font-weight: 300;
-  color: #666;
+  color: var(--soft);
   margin: 0;
   line-height: 1.35;
 }
@@ -651,6 +653,7 @@ body::before {
 }
 .ftr .bot a {
   display: block;
+  padding-block: 4px; /* зона нажатия не меньше 24px */
   text-decoration: underline;
   text-underline-offset: 2px;
   margin-top: 8px;
@@ -690,7 +693,7 @@ body::before {
 }
 .tabs a {
   text-align: center;
-  color: #3f3f3f;
+  color: var(--soft);
   padding: 14px 0;
   border-bottom: 1px solid #2a2a2a;
   font-size: 14px;
@@ -724,7 +727,7 @@ body::before {
 }
 .pj-top p {
   font-size: 12px;
-  color: #555;
+  color: var(--soft);
   margin: 0;
   white-space: nowrap;
 }
@@ -919,7 +922,7 @@ body::before {
 .q-sub {
   font-size: 15px;
   font-weight: 300;
-  color: #555;
+  color: var(--soft);
   margin: 46px 46px 30px;
 }
 .q-body {
@@ -1013,7 +1016,7 @@ body::before {
   margin: 80px 46px 0;
   font-size: 15px;
   font-weight: 300;
-  color: #555;
+  color: var(--soft);
 }
 .q-foot .nav {
   display: flex;
@@ -1083,7 +1086,7 @@ body::before {
   .card .t {
     padding: 18px 16px 56px;
   }
-  .card h3 {
+  .card h2 {
     font-size: 20px;
   }
   .team > .ph {
@@ -1115,7 +1118,7 @@ body::before {
     grid-template-columns: 1fr 1fr;
     row-gap: 36px;
   }
-  .ftr h5 {
+  .ftr .fh {
     font-size: 16px;
     overflow-wrap: anywhere;
   }
