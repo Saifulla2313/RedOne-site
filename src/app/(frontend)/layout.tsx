@@ -11,7 +11,6 @@ import './site.css'
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
-  weight: ['300', '400', '500', '600'],
   variable: '--f',
   display: 'swap',
 })
@@ -20,6 +19,7 @@ const montserrat = Montserrat({
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'),
   title: { default: 'RedONE — дизайн интерьера и архитектура', template: '%s — RedONE' },
   description: '[Описание бюро для поиска: услуги, города, опыт.]',
 }

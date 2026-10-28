@@ -15,8 +15,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!p) return {}
   return {
     title: p.seo?.title ?? p.title,
-    description: p.seo?.description ?? p.excerpt,
+    // без описания в админке собираем его из названия и параметров, чтобы в поиске не было пусто
+    description:
+      p.seo?.description ||
+      p.excerpt ||
+      `${p.title}: дизайн интерьера, ${projectMeta(p)}. Бюро RedONE.`,
     robots: p.seo?.noindex ? { index: false } : undefined,
+    alternates: { canonical: `/proekty/${p.slug}` },
     openGraph: { images: p.seo?.ogImage?.url ?? p.hero?.url ?? p.cover?.url },
   }
 }
