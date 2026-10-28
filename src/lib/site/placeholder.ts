@@ -229,7 +229,7 @@ export async function getMenu(): Promise<MenuItem[]> {
 
 export async function getQuiz(): Promise<Quiz> {
   return {
-    intro: 'Ответьте на 4 вопроса и сразу увидите стоимость проекта для вашей площади',
+    intro: 'Ответьте на несколько вопросов и сразу увидите стоимость проекта для вашей площади',
     steps: [
       {
         q: 'Какой объект нужно спроектировать?',
