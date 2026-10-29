@@ -62,6 +62,7 @@ export function Header({ menu, logo }: { menu: MenuItem[]; logo: Media }) {
               {m.label}
             </Link>
           ))}
+          {!menu.some((m) => m.link === '/kontakty') && <Link href="/kontakty">Контакты</Link>}
           <Link href="/kviz">Рассчитать стоимость</Link>
         </nav>
       )}

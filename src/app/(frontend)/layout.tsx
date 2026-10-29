@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
-import { Suspense } from 'react'
+import { Suspense, ViewTransition } from 'react'
 import { CookieBar } from '@/components/site/CookieBar'
 import { Footer } from '@/components/site/Footer'
 import { Header } from '@/components/site/Header'
@@ -48,7 +48,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <html lang="ru" className={montserrat.variable}>
       <body>
         <Header menu={menu} logo={brand.logo} />
-        {children}
+        {/* плавная смена страниц: старая гаснет, новая проявляется (как на образце) */}
+        <ViewTransition default="page">{children}</ViewTransition>
         <OfficeSection photos={brand.officeSlider} />
         <Footer contacts={contacts} />
         <CookieBar />

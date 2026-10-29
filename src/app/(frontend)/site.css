@@ -1365,3 +1365,93 @@ body::before {
     overflow-wrap: anywhere;
   }
 }
+
+/* ---------- переходы между страницами ---------- */
+/* Шапка не меняется, анимируем только содержимое страницы */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(.page) {
+  animation-duration: 0s;
+}
+::view-transition-old(.page) {
+  animation: pg-out 0.22s ease-out both;
+}
+::view-transition-new(.page) {
+  animation: pg-in 0.45s ease-in 0.12s both;
+}
+@keyframes pg-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes pg-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.page),
+  ::view-transition-new(.page) {
+    animation: none;
+  }
+}
+
+/* ---------- контакты ---------- */
+.kt {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  padding-block: 96px;
+}
+.kt-h {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.kt p,
+.kt-req p {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--soft);
+  margin: 0;
+  line-height: 1.4;
+}
+.kt .kt-lbl,
+.kt-req .kt-lbl {
+  font-size: 12px;
+  margin: 24px 0 10px;
+  color: var(--fg);
+  font-weight: 400;
+}
+.kt-lnk {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.kt-req {
+  padding-bottom: 32px;
+}
+.kt-req .kt-lbl {
+  margin-top: 0;
+}
+@media (max-width: 900px) {
+  .kt {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 48px 24px;
+    padding-block: 64px;
+  }
+}
+@media (max-width: 600px) {
+  .kt {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  .kt-h {
+    font-size: 20px;
+  }
+}
