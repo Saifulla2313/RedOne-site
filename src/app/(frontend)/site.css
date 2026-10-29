@@ -1339,18 +1339,13 @@ body::before {
   font-size: 24px;
   font-weight: 500;
   color: var(--fg);
-  margin: 0;
+  margin: 0 0 24px;
 }
 .legal h3 {
   font-size: 18px;
   font-weight: 500;
   color: var(--fg);
   margin: 40px 0 12px;
-}
-.legal-ver {
-  color: var(--soft);
-  font-size: 13px;
-  margin: 8px 0 32px;
 }
 .legal ul {
   padding-left: 20px;
@@ -1363,48 +1358,10 @@ body::before {
   text-decoration: underline;
   text-decoration-color: #666;
 }
-.legal-t {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 8px 0 16px;
-}
-.legal-t th,
-.legal-t td {
-  text-align: left;
-  vertical-align: top;
-  padding: 12px 12px 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-.legal-t th {
-  font-weight: 500;
-  color: var(--fg);
-}
 @media (max-width: 640px) {
   .legal {
     padding-block: 40px 64px;
     font-size: 14px;
     overflow-wrap: anywhere;
-  }
-  .legal-t,
-  .legal-t tbody,
-  .legal-t tr,
-  .legal-t td {
-    display: block;
-  }
-  .legal-t thead {
-    display: none;
-  }
-  .legal-t tr {
-    padding-block: 12px;
-    border-bottom: 1px solid var(--line);
-  }
-  .legal-t td {
-    border: 0;
-    padding: 2px 0;
-  }
-  .legal-t td:first-child {
-    color: var(--fg);
   }
 }

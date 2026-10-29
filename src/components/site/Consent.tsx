@@ -13,13 +13,13 @@ export function Consent({
     <label className={`agree ${className}`.trim()}>
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       <span>
-        Я даю{' '}
-        <a href="/soglasie" target="_blank">
-          согласие на обработку персональных данных
-        </a>{' '}
-        и ознакомлен(а) с{' '}
+        Я согласен (-а) с{' '}
         <a href="/politika" target="_blank">
           политикой конфиденциальности
+        </a>{' '}
+        в отношении пользовательских данных и даю свое{' '}
+        <a href="/soglasie" target="_blank">
+          согласие на обработку персональных данных
         </a>
       </span>
     </label>
