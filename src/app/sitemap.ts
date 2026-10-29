@@ -33,6 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     })),
     { url: url('/kviz'), changeFrequency: 'yearly', priority: 0.5 },
+    { url: url('/kontakty'), changeFrequency: 'yearly', priority: 0.6 },
     { url: url('/politika'), changeFrequency: 'yearly', priority: 0.1 },
     { url: url('/soglasie'), changeFrequency: 'yearly', priority: 0.1 },
   ]
