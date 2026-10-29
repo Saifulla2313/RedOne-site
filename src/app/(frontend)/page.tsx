@@ -1,8 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
 import { FeaturedProjects } from '@/components/site/FeaturedProjects'
 import { Photo } from '@/components/site/Photo'
 import { getBrand, getFeaturedProjects } from '@/lib/site/data'
+
+export const metadata: Metadata = { alternates: { canonical: '/' } }
 
 const ctaHref = {
   quiz: '/kviz',

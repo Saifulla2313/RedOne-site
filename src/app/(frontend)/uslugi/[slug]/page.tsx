@@ -3,10 +3,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
+import { JsonLd } from '@/components/site/JsonLd'
 import { Photo } from '@/components/site/Photo'
 import { ProjectGrid } from '@/components/site/ProjectCard'
-import { getFeaturedProjects, getPricing, getService } from '@/lib/site/data'
+import { getContacts, getFeaturedProjects, getPricing, getService } from '@/lib/site/data'
 import { fullLabel, priceLabel, rub } from '@/lib/site/pricing'
+import { breadcrumbs, service as serviceLd } from '@/lib/site/schema'
 import type { Package } from '@/lib/site/types'
 import '../../pricing.css'
 
@@ -15,7 +17,11 @@ type Params = Promise<{ slug: string }>
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const s = await getService((await params).slug)
   if (!s) return {}
-  return { title: s.seo?.title ?? s.title, description: s.seo?.description ?? s.offer }
+  return {
+    title: s.seo?.title ?? s.title,
+    description: s.seo?.description ?? s.offer,
+    alternates: { canonical: `/uslugi/${s.slug}` },
+  }
 }
 
 function PackCard({ p }: { p: Package }) {
@@ -36,7 +42,7 @@ function PackCard({ p }: { p: Package }) {
 
 export default async function ServicePage({ params }: { params: Params }) {
   const slug = (await params).slug
-  const [s, pricing] = await Promise.all([getService(slug), getPricing()])
+  const [s, pricing, contacts] = await Promise.all([getService(slug), getPricing(), getContacts()])
   if (!s) notFound()
   const featured = (await getFeaturedProjects()).slice(0, 4)
   const price = pricing.items.find((i) => i.slug === s.slug)
@@ -137,19 +143,15 @@ export default async function ServicePage({ params }: { params: Params }) {
               <p>{f.a}</p>
             </details>
           ))}
-          <script
-            type="application/ld+json"
-            // JSON.stringify не экранирует «</», поэтому заменяем вручную
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                '@context': 'https://schema.org',
-                '@type': 'FAQPage',
-                mainEntity: s.faq.map((f) => ({
-                  '@type': 'Question',
-                  name: f.q,
-                  acceptedAnswer: { '@type': 'Answer', text: f.a },
-                })),
-              }).replace(/</g, '\\u003c'),
+          <JsonLd
+            data={{
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: s.faq.map((f) => ({
+                '@type': 'Question',
+                name: f.q,
+                acceptedAnswer: { '@type': 'Answer', text: f.a },
+              })),
             }}
           />
         </section>
@@ -158,6 +160,16 @@ export default async function ServicePage({ params }: { params: Params }) {
       <ExcursionForm />
       <h2 className="sec-h rv">Новые проекты</h2>
       <ProjectGrid projects={featured} />
+      <JsonLd
+        data={[
+          breadcrumbs([
+            { name: 'Главная', path: '/' },
+            { name: 'Услуги', path: '/uslugi' },
+            { name: s.title, path: `/uslugi/${s.slug}` },
+          ]),
+          serviceLd(s, contacts, price),
+        ]}
+      />
     </main>
   )
 }

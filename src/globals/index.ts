@@ -134,11 +134,33 @@ export const Contacts: GlobalConfig = {
       ],
     },
     {
-      type: 'row',
+      type: 'collapsible',
+      label: 'Реквизиты оператора персональных данных',
+      admin: {
+        description:
+          'Подставляются в футер, «Политику конфиденциальности» (/politika), «Согласие на обработку данных» (/soglasie) и микроразметку.',
+      },
       fields: [
-        { name: 'company', label: 'Юрлицо', type: 'text' },
-        { name: 'inn', label: 'ИНН', type: 'text' },
-        { name: 'ogrn', label: 'ОГРН', type: 'text' },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'company',
+              label: 'Юрлицо или ИП',
+              type: 'text',
+              admin: { placeholder: 'ООО «РедВан» или ИП Иванов Иван Иванович' },
+            },
+            { name: 'inn', label: 'ИНН', type: 'text' },
+            { name: 'ogrn', label: 'ОГРН / ОГРНИП', type: 'text' },
+          ],
+        },
+        { name: 'legalAddress', label: 'Юридический адрес', type: 'text' },
+        {
+          name: 'privacyEmail',
+          label: 'Почта для запросов по персональным данным',
+          type: 'email',
+          admin: { description: 'Пусто: возьмётся основная почта.' },
+        },
       ],
     },
   ],
@@ -392,7 +414,15 @@ export const SeoDefaults: GlobalConfig = {
       type: 'textarea',
       defaultValue: 'User-agent: *\nDisallow: /admin\nDisallow: /api\nDisallow: /lp/',
     },
-    { name: 'yandexVerification', label: 'Код Яндекс Вебмастера', type: 'text' },
+    {
+      name: 'yandexVerification',
+      label: 'Код Яндекс Вебмастера',
+      type: 'text',
+      admin: {
+        description:
+          'Только значение content из мета-тега <meta name="yandex-verification" content="…">. Переменная YANDEX_VERIFICATION на сервере важнее.',
+      },
+    },
   ],
 }
 
@@ -420,7 +450,12 @@ export const Integrations: GlobalConfig = {
           type: 'text',
           admin: { description: 'Токен бота задаётся в TELEGRAM_BOT_TOKEN на сервере.' },
         },
-        { name: 'metrikaId', label: 'Номер счётчика Яндекс Метрики', type: 'text' },
+        {
+          name: 'metrikaId',
+          label: 'Номер счётчика Яндекс Метрики',
+          type: 'text',
+          admin: { description: 'Только цифры. Переменная NEXT_PUBLIC_YANDEX_METRIKA_ID на сервере важнее.' },
+        },
       ],
     },
     {

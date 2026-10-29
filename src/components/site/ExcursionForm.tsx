@@ -3,6 +3,7 @@
 import { useId, useState } from 'react'
 import { formatPhone, phoneComplete, sendLead } from '@/lib/site/leads'
 import type { Media } from '@/lib/site/types'
+import { CONSENT_HINT, Consent } from './Consent'
 import { Photo } from './Photo'
 
 type State = 'idle' | 'sending' | 'done' | 'error'
@@ -10,14 +11,14 @@ type State = 'idle' | 'sending' | 'done' | 'error'
 export function ExcursionForm({ media }: { media?: Media }) {
   const id = useId()
   const [phone, setPhone] = useState('')
-  const [agree, setAgree] = useState(true)
+  const [agree, setAgree] = useState(false)
   const [state, setState] = useState<State>('idle')
   const [hint, setHint] = useState('')
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!phoneComplete(phone)) return setHint('Введите номер полностью: 10 цифр после +7')
-    if (!agree) return setHint('Отметьте согласие на обработку данных')
+    if (!agree) return setHint(CONSENT_HINT)
     setHint('')
     setState('sending')
     try {
@@ -54,13 +55,7 @@ export function ExcursionForm({ media }: { media?: Media }) {
                 {state === 'sending' ? 'Отправляем…' : 'Записаться'}
               </button>
             </div>
-            <label className="agree">
-              <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-              <span>
-                Я согласен(на) на обработку персональных данных в соответствии с{' '}
-                <a href="/politika">политикой конфиденциальности</a>
-              </span>
-            </label>
+            <Consent checked={agree} onChange={setAgree} />
             {(hint || state === 'error') && (
               <p className="err" role="alert">
                 {hint || 'Не получилось отправить. Попробуйте ещё раз или позвоните нам.'}

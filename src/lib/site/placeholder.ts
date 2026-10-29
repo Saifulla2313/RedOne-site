@@ -214,6 +214,9 @@ export async function getContacts(): Promise<Contacts> {
     ],
     company: '[Юрлицо]',
     inn: '[номер]',
+    ogrn: '[номер]',
+    legalAddress: '[Юридический адрес]',
+    privacyEmail: 'mail@[домен].ru',
   }
 }
 
