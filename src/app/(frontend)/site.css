@@ -846,13 +846,6 @@ body::before {
 }
 
 /* ---------- услуга и цены ---------- */
-.price-top {
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 120px 120px;
-  background-position: -1px -1px;
-}
 .price-top h1 {
   font-size: clamp(32px, 3.4vw, 48px);
   font-weight: 500;
