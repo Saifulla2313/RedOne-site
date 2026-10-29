@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
+import { JsonLd } from '@/components/site/JsonLd'
 import { Photo } from '@/components/site/Photo'
 import { VideoBlock } from '@/components/site/VideoBlock'
 import { getProject } from '@/lib/site/data'
-import { projectMeta } from '@/lib/site/format'
+import { categoryTitle, projectHref, projectMeta } from '@/lib/site/format'
+import { breadcrumbs, project as projectLd } from '@/lib/site/schema'
 import type { ProjectSection } from '@/lib/site/types'
 
 type Params = Promise<{ slug: string }>
@@ -90,6 +92,17 @@ export default async function ProjectPage({ params }: { params: Params }) {
       ))}
 
       <ExcursionForm />
+      <JsonLd
+        data={[
+          breadcrumbs([
+            { name: 'Главная', path: '/' },
+            { name: 'Проекты', path: '/proekty' },
+            { name: categoryTitle[p.category], path: `/proekty?category=${p.category}` },
+            { name: p.title, path: projectHref(p.slug) },
+          ]),
+          projectLd(p),
+        ]}
+      />
     </main>
   )
 }

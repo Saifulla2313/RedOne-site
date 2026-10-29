@@ -1,15 +1,15 @@
 import type { MetadataRoute } from 'next'
 import { getProjects, getServices } from '@/lib/site/data'
 import { categoryTitle } from '@/lib/site/format'
-
-const site = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+import { absUrl } from '@/lib/site/url'
 
 // Список страниц берём из админки на каждый запрос, чтобы новые проекты сразу попадали в карту
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [projects, services] = await Promise.all([getProjects(), getServices()])
-  const url = (path: string) => `${site}${path}`
+  if (process.env.SITE_NOINDEX === '1') return []
+  const url = absUrl
   return [
     { url: url('/'), changeFrequency: 'weekly', priority: 1 },
     { url: url('/proekty'), changeFrequency: 'weekly', priority: 0.9 },
@@ -33,5 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     })),
     { url: url('/kviz'), changeFrequency: 'yearly', priority: 0.5 },
+    { url: url('/politika'), changeFrequency: 'yearly', priority: 0.1 },
+    { url: url('/soglasie'), changeFrequency: 'yearly', priority: 0.1 },
   ]
 }

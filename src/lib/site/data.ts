@@ -3,11 +3,13 @@
 // В разработке, пока в админке пусто или база не поднята, страницы показывают заглушки из placeholder.ts.
 import config from '@payload-config'
 import { getPayload } from 'payload'
+import { cache } from 'react'
 import type { Media as PMedia, Project as PProject, Service as PService } from '@/payload-types'
 import * as placeholder from './placeholder'
 import type {
   Brand,
   Category,
+  Analytics,
   Contacts,
   Media,
   MenuItem,
@@ -280,6 +282,9 @@ export async function getContacts(): Promise<Contacts> {
         ),
         company: orDev(c.company, fb.company),
         inn: orDev(c.inn, fb.inn),
+        ogrn: orDev(c.ogrn, fb.ogrn),
+        legalAddress: orDev(c.legalAddress, fb.legalAddress),
+        privacyEmail: c.privacyEmail || orDev(c.email, fb.privacyEmail),
       }
     },
     async () => fb,
@@ -350,3 +355,28 @@ export async function getQuiz(): Promise<Quiz> {
     () => false,
   )
 }
+
+// Код Вебмастера и номер Метрики: переменные окружения важнее админки.
+// «Интеграции» закрыты от публичного чтения, поэтому читаем с overrideAccess и берём только номер счётчика.
+export const getAnalytics = cache(async (): Promise<Analytics> => {
+  const env = {
+    yandexVerification: process.env.YANDEX_VERIFICATION?.trim() || undefined,
+    metrikaId: process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID?.replace(/\D/g, '') || undefined,
+  }
+  if (env.yandexVerification && env.metrikaId) return env
+  try {
+    const p = await payload()
+    const [seo, integrations] = await Promise.all([
+      p.findGlobal({ slug: 'seo-defaults', overrideAccess: false }),
+      p.findGlobal({ slug: 'integrations', overrideAccess: true, select: { metrikaId: true } }),
+    ])
+    const id = integrations.metrikaId?.replace(/\D/g, '')
+    return {
+      yandexVerification: env.yandexVerification ?? (seo.yandexVerification?.trim() || undefined),
+      metrikaId: env.metrikaId ?? (id || undefined),
+    }
+  } catch (err) {
+    if (!dev) throw err
+    return env
+  }
+})

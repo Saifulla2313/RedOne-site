@@ -189,6 +189,11 @@ export interface Lead {
     | boolean
     | null;
   metrikaClientId?: string | null;
+  consent?: boolean | null;
+  /**
+   * Дата редакции текста /soglasie на момент заявки.
+   */
+  consentVersion?: string | null;
   telegramSent?: boolean | null;
   /**
    * Интеграция в техдолге.
@@ -964,6 +969,8 @@ export interface LeadsSelect<T extends boolean = true> {
   sourcePage?: T;
   utm?: T;
   metrikaClientId?: T;
+  consent?: T;
+  consentVersion?: T;
   telegramSent?: T;
   bitrixSent?: T;
   updatedAt?: T;
@@ -1510,6 +1517,11 @@ export interface Contact {
   company?: string | null;
   inn?: string | null;
   ogrn?: string | null;
+  legalAddress?: string | null;
+  /**
+   * Пусто: возьмётся основная почта.
+   */
+  privacyEmail?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1600,6 +1612,9 @@ export interface SeoDefault {
   descriptionTemplate?: string | null;
   ogDefault?: (number | null) | Media;
   robots?: string | null;
+  /**
+   * Только значение content из мета-тега <meta name="yandex-verification" content="…">. Переменная YANDEX_VERIFICATION на сервере важнее.
+   */
   yandexVerification?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1616,6 +1631,9 @@ export interface Integration {
    * Токен бота задаётся в TELEGRAM_BOT_TOKEN на сервере.
    */
   telegramChatId?: string | null;
+  /**
+   * Только цифры. Переменная NEXT_PUBLIC_YANDEX_METRIKA_ID на сервере важнее.
+   */
   metrikaId?: string | null;
   /**
    * Пока не используется.
@@ -1683,6 +1701,8 @@ export interface ContactsSelect<T extends boolean = true> {
   company?: T;
   inn?: T;
   ogrn?: T;
+  legalAddress?: T;
+  privacyEmail?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -24,7 +24,7 @@ const verifyCaptcha = async (token: string | undefined, ip: string | undefined) 
 
 /**
  * POST /api/leads/submit — приём заявки с сайта.
- * Тело: { phone*, name, channel, type, answers, estimate, sourcePage, utm, metrikaClientId, captchaToken, website }
+ * Тело: { phone*, consent* (true), consentVersion, name, channel, type, answers, estimate, sourcePage, utm, metrikaClientId, captchaToken, website }
  * `website` — скрытое поле-ловушка для ботов, у людей всегда пустое.
  */
 export const submitLead: PayloadHandler = async (req) => {
@@ -34,6 +34,11 @@ export const submitLead: PayloadHandler = async (req) => {
   const phone = str(body.phone, 40)
   const digits = phone?.replace(/\D/g, '') ?? ''
   if (digits.length < 10) return Response.json({ error: 'Укажите телефон' }, { status: 400 })
+
+  // Согласие на обработку ПД обязательно (152-ФЗ): без галочки форма не отправляется, это проверка от обхода
+  if (body.consent !== true) {
+    return Response.json({ error: 'Нужно согласие на обработку персональных данных' }, { status: 400 })
+  }
 
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
   const isBot = Boolean(str(body.website)) || !(await verifyCaptcha(str(body.captchaToken, 2000), ip))
@@ -55,6 +60,8 @@ export const submitLead: PayloadHandler = async (req) => {
       sourcePage: str(body.sourcePage, 500),
       utm: typeof body.utm === 'object' && body.utm ? (body.utm as Record<string, unknown>) : undefined,
       metrikaClientId: str(body.metrikaClientId, 64),
+      consent: true,
+      consentVersion: str(body.consentVersion, 20),
     },
   })
 

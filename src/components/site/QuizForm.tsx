@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { formatPhone, phoneComplete, sendLead } from '@/lib/site/leads'
 import { rates, rub } from '@/lib/site/pricing'
 import type { Pricing, Quiz } from '@/lib/site/types'
+import { CONSENT_HINT, Consent } from './Consent'
 import { AreaInput, Estimate } from './PriceCalculator'
 
 export function QuizForm({ quiz, pricing }: { quiz: Quiz; pricing?: Pricing }) {
@@ -13,6 +14,7 @@ export function QuizForm({ quiz, pricing }: { quiz: Quiz; pricing?: Pricing }) {
   const [area, setArea] = useState(pricing?.exampleArea ?? 100)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [agree, setAgree] = useState(false)
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [hint, setHint] = useState('')
 
@@ -29,6 +31,7 @@ export function QuizForm({ quiz, pricing }: { quiz: Quiz; pricing?: Pricing }) {
     setHint('')
     if (!last) return setStep(step + 1)
     if (!phoneComplete(phone)) return setHint('Введите номер полностью: 10 цифр после +7')
+    if (!agree) return setHint(CONSENT_HINT)
     setState('sending')
     const r = pricing && rates(pricing)
     const hasArea = steps.some((s) => s.kind === 'slider')
@@ -109,10 +112,7 @@ export function QuizForm({ quiz, pricing }: { quiz: Quiz; pricing?: Pricing }) {
                       onChange={(e) => setPhone(formatPhone(e.target.value))}
                     />
                   </div>
-                  <p className="agree-note">
-                    Нажимая кнопку, вы соглашаетесь с{' '}
-                    <a href="/politika">политикой конфиденциальности</a>
-                  </p>
+                  <Consent className="q-agree" checked={agree} onChange={setAgree} />
                 </>
               ) : current.kind === 'slider' ? (
                 <>

@@ -1,3 +1,5 @@
+import { LEGAL_VERSION } from './legal'
+import { getClientId, reachGoal } from './metrika'
 import type { LeadType } from './types'
 
 export type LeadPayload = {
@@ -6,6 +8,9 @@ export type LeadPayload = {
   name?: string
   answers?: Record<string, string>
 }
+
+// Отправляем только после отмеченной галочки согласия, поэтому consent всегда true;
+// сервер без него заявку не примет.
 
 // Приём заявок: src/endpoints/submitLead.ts (POST /api/leads/submit, ответ 201 или 400 {error}).
 // website — поле-ловушка для ботов, люди его не видят, поэтому всегда пустое.
@@ -18,6 +23,9 @@ export async function sendLead(payload: LeadPayload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       ...payload,
+      consent: true,
+      consentVersion: LEGAL_VERSION,
+      metrikaClientId: await getClientId(),
       channel: 'phone',
       sourcePage: window.location.pathname,
       utm,
@@ -25,6 +33,9 @@ export async function sendLead(payload: LeadPayload) {
     }),
   })
   if (!res.ok) throw new Error(`lead ${res.status}`)
+  // цель в Метрике: lead (все заявки) и lead_quiz / lead_excursion по типу формы
+  reachGoal('lead', { type: payload.type })
+  reachGoal(`lead_${payload.type}`)
 }
 
 // Оставляем в номере только цифры после +7 и форматируем как +7 (000) 000-00-00

@@ -1,15 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
+import { JsonLd } from '@/components/site/JsonLd'
 import { Photo } from '@/components/site/Photo'
 import { getPricing, getServices } from '@/lib/site/data'
 import { priceLabel, rates, rub } from '@/lib/site/pricing'
+import { breadcrumbs } from '@/lib/site/schema'
 import '../pricing.css'
 
 export const metadata: Metadata = {
   title: 'Услуги: дизайн интерьера, проектирование и ремонт под ключ',
   description:
     'Замер, планировка, визуализация, рабочие и инженерные чертежи, смета, комплектация, авторский надзор и ремонт под ключ с гарантией 5 лет.',
+  alternates: { canonical: '/uslugi' },
 }
 
 export default async function ServicesPage() {
@@ -97,6 +100,12 @@ export default async function ServicesPage() {
       )}
 
       <ExcursionForm />
+      <JsonLd
+        data={breadcrumbs([
+          { name: 'Главная', path: '/' },
+          { name: 'Услуги', path: '/uslugi' },
+        ])}
+      />
     </main>
   )
 }

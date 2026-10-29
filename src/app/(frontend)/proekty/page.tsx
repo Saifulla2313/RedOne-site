@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { JsonLd } from '@/components/site/JsonLd'
 import { ProjectGrid } from '@/components/site/ProjectCard'
 import { getProjects } from '@/lib/site/data'
 import { categoryTitle } from '@/lib/site/format'
+import { breadcrumbs } from '@/lib/site/schema'
 import type { Category, ProjectStatus } from '@/lib/site/types'
 
 type Search = Promise<{ category?: string; status?: string }>
@@ -58,6 +60,15 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
         ))}
       </nav>
       <ProjectGrid projects={projects} />
+      <JsonLd
+        data={breadcrumbs([
+          { name: 'Главная', path: '/' },
+          { name: 'Проекты', path: '/proekty' },
+          ...(category
+            ? [{ name: categoryTitle[category], path: `/proekty?category=${category}` }]
+            : []),
+        ])}
+      />
     </main>
   )
 }

@@ -107,6 +107,15 @@ export type Contacts = {
   socials: { name: string; url: string }[]
   company: string
   inn: string
+  ogrn: string
+  legalAddress: string
+  // почта для запросов по персональным данным; пусто в админке — основная почта
+  privacyEmail: string
+}
+
+export type Analytics = {
+  yandexVerification?: string
+  metrikaId?: string
 }
 
 export type MenuItem = { label: string; link: string }

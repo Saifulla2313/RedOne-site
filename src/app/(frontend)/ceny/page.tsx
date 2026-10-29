@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
+import { JsonLd } from '@/components/site/JsonLd'
 import { PriceCalculator } from '@/components/site/PriceCalculator'
 import { PriceTable } from '@/components/site/PriceTable'
 import { getPricing } from '@/lib/site/data'
 import { extraGifts, priceLabel, rates, rub } from '@/lib/site/pricing'
+import { breadcrumbs, priceCatalog } from '@/lib/site/schema'
 import '../pricing.css'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -13,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Услуги и цены на дизайн интерьера и ремонт',
     description: `Замер, планировка, визуализация, чертежи, инженерия и смета. Пакет ${p.fullTitle}: ${rub(r.full)} ₽/м² вместо ${rub(r.separate)} ₽/м², авторский надзор в подарок.`,
+    alternates: { canonical: '/ceny' },
   }
 }
 
@@ -86,6 +89,15 @@ export default async function PricesPage() {
       </section>
 
       <ExcursionForm />
+      <JsonLd
+        data={[
+          breadcrumbs([
+            { name: 'Главная', path: '/' },
+            { name: 'Услуги и цены', path: '/ceny' },
+          ]),
+          priceCatalog(pricing),
+        ]}
+      />
     </main>
   )
 }

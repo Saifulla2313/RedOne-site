@@ -84,6 +84,23 @@ export const Leads: CollectionConfig = {
         { name: 'sourcePage', label: 'Страница', type: 'text', admin: { readOnly: true } },
         { name: 'utm', label: 'UTM-метки', type: 'json', admin: { readOnly: true } },
         { name: 'metrikaClientId', label: 'ClientID Метрики', type: 'text', admin: { readOnly: true } },
+        {
+          type: 'row',
+          fields: [
+            {
+              name: 'consent',
+              label: 'Дал согласие на обработку ПД',
+              type: 'checkbox',
+              admin: { readOnly: true },
+            },
+            {
+              name: 'consentVersion',
+              label: 'Редакция согласия',
+              type: 'text',
+              admin: { readOnly: true, description: 'Дата редакции текста /soglasie на момент заявки.' },
+            },
+          ],
+        },
       ],
     },
     {
