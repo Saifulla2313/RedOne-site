@@ -618,6 +618,12 @@ body::before {
 .ftr {
   padding-block: 60px 30px;
 }
+.ftr-logo {
+  display: block;
+  height: 24px;
+  width: auto;
+  margin-bottom: 48px;
+}
 .ftr .cols {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

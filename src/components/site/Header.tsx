@@ -33,7 +33,15 @@ export function Header({ menu, logo }: { menu: MenuItem[]; logo: Media }) {
               priority
             />
           ) : (
-            'RedONE'
+            // логотип по умолчанию, пока в админке не загружен свой
+            <Image
+              src="/brand/logo-header.png"
+              alt="RED ONE"
+              width={482}
+              height={131}
+              style={{ height: 28, width: 'auto' }}
+              priority
+            />
           )}
         </Link>
         <div className="r">

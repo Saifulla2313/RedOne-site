@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Contacts } from '@/lib/site/types'
 
@@ -6,6 +7,13 @@ export function Footer({ contacts }: { contacts: Contacts }) {
   const phone = contacts.phones[0]?.phone
   return (
     <footer className="ftr wrap">
+      <Image
+        className="ftr-logo"
+        src="/brand/logo-footer.png"
+        alt="RED ONE, студия архитектурного дизайна"
+        width={1104}
+        height={96}
+      />
       <div className="cols">
         {[office1, office2].filter(Boolean).map((o) => (
           <div key={o.city}>

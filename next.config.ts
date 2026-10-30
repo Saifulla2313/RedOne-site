@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
       {
         pathname: '/api/media/file/**',
       },
+      // логотипы по умолчанию из public/brand
+      { pathname: '/brand/**' },
     ],
   },
   webpack: (webpackConfig) => {
