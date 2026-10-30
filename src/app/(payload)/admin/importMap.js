@@ -25,6 +25,8 @@ import { SectionRowLabel as SectionRowLabel_7f4fa5fc68fb5a0a92393f6444a57fbd } f
 import { SimilarNote as SimilarNote_b1f9a6b9bae36f5ee25cc75b578bb654 } from '@/components/admin/Note'
 import { FeaturedNote as FeaturedNote_b1f9a6b9bae36f5ee25cc75b578bb654 } from '@/components/admin/Note'
 import { BitrixNote as BitrixNote_b1f9a6b9bae36f5ee25cc75b578bb654 } from '@/components/admin/Note'
+import { Icon as Icon_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
+import { Logo as Logo_a44df17d0fc3dcd873dae43dc3bf66bd } from '@/components/admin/Logo'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -56,5 +58,7 @@ export const importMap = {
   "@/components/admin/Note#SimilarNote": SimilarNote_b1f9a6b9bae36f5ee25cc75b578bb654,
   "@/components/admin/Note#FeaturedNote": FeaturedNote_b1f9a6b9bae36f5ee25cc75b578bb654,
   "@/components/admin/Note#BitrixNote": BitrixNote_b1f9a6b9bae36f5ee25cc75b578bb654,
+  "@/components/admin/Logo#Icon": Icon_a44df17d0fc3dcd873dae43dc3bf66bd,
+  "@/components/admin/Logo#Logo": Logo_a44df17d0fc3dcd873dae43dc3bf66bd,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

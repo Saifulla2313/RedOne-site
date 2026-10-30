@@ -41,11 +41,18 @@ async function withFallback<T>(
   }
 }
 
+// Payload отдаёт абсолютный адрес файла (serverURL), а next/image пропускает только свои пути
+// /api/media/file/** — поэтому отрезаем домен
+const local = (url: string) => {
+  const u = new URL(url, 'http://local')
+  return u.pathname.startsWith('/api/media/') ? u.pathname + u.search : url
+}
+
 const media = (m: number | PMedia | null | undefined, size?: 'card' | 'wide'): Media => {
   if (!m || typeof m === 'number' || !m.url) return null
   const variant = size ? m.sizes?.[size] : undefined
   return {
-    url: variant?.url ?? m.url,
+    url: local(variant?.url ?? m.url),
     alt: m.alt,
     width: variant?.width ?? m.width ?? undefined,
     height: variant?.height ?? m.height ?? undefined,

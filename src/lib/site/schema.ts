@@ -58,8 +58,12 @@ export function organization(brand: Brand, c: Contacts) {
         alternateName: 'RED ONE',
         description: brand.slogan,
         url: siteUrl,
-        logo: brand.logo ? absUrl(brand.logo.url) : undefined,
-        image: brand.teamPhoto ? absUrl(brand.teamPhoto.url) : brand.logo ? absUrl(brand.logo.url) : undefined,
+        logo: absUrl(brand.logo?.url ?? '/brand/logo-square.png'),
+        image: brand.teamPhoto
+          ? absUrl(brand.teamPhoto.url)
+          : brand.logo
+            ? absUrl(brand.logo.url)
+            : undefined,
         telephone: phone,
         email: c.email,
         address: main ? address(main) : undefined,
@@ -106,7 +110,11 @@ function priceSpec(i: Pick<PriceItem, 'price' | 'unit'>) {
 }
 
 export function service(s: Service, c: Contacts, price?: PriceItem) {
-  const spec = price ? priceSpec(price) : s.priceFrom > 0 ? priceSpec({ price: s.priceFrom, unit: 'm2' }) : undefined
+  const spec = price
+    ? priceSpec(price)
+    : s.priceFrom > 0
+      ? priceSpec({ price: s.priceFrom, unit: 'm2' })
+      : undefined
   return ld({
     '@type': 'Service',
     name: s.title,
