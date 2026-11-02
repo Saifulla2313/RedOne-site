@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { preload } from 'react-dom'
 import { ExcursionForm } from '@/components/site/ExcursionForm'
 import { FeaturedProjects } from '@/components/site/FeaturedProjects'
 import { Photo } from '@/components/site/Photo'
@@ -21,21 +22,36 @@ const directions = [
 
 export default async function HomePage() {
   const [brand, featured] = await Promise.all([getBrand(), getFeaturedProjects()])
+  // Постер — самый крупный элемент первого экрана (LCP), грузим его первым
+  const poster = brand.heroVideo?.poster?.url
+  if (poster) preload(poster, { as: 'image', fetchPriority: 'high' })
 
   return (
     <main>
       <section className="hero">
         {brand.heroVideo?.url ? (
-          <video
-            className="hero-bg"
-            src={brand.heroVideo.url}
-            poster={brand.heroVideo.poster?.url}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-          />
+          <>
+            <video
+              className="hero-bg"
+              poster={brand.heroVideo.poster?.url}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden="true"
+            >
+              {brand.heroVideo.mobileUrl && (
+                <source
+                  src={brand.heroVideo.mobileUrl}
+                  type="video/mp4"
+                  media="(max-width: 767px)"
+                />
+              )}
+              <source src={brand.heroVideo.url} type="video/mp4" />
+            </video>
+            <div className="hero-shade" />
+          </>
         ) : (
           <Photo
             media={null}

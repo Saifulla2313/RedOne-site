@@ -299,6 +299,17 @@ body::before {
   height: 100%;
   object-fit: cover;
 }
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35),
+    rgba(0, 0, 0, 0.15) 45%,
+    rgba(0, 0, 0, 0.4)
+  );
+  pointer-events: none;
+}
 .hero .ph::before {
   animation: kb 22s ease-in-out infinite alternate;
 }

@@ -91,7 +91,7 @@ export type Pricing = {
 
 export type Brand = {
   logo: Media
-  heroVideo?: { url: string; poster?: Media } | null
+  heroVideo?: { url: string; mobileUrl?: string; poster?: Media } | null
   slogan: string
   heroCta: string
   heroCtaAction: 'quiz' | 'excursion' | 'prices'
