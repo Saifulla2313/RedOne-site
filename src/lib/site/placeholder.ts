@@ -185,7 +185,12 @@ export async function getPricing() {
 export async function getBrand(): Promise<Brand> {
   return {
     logo: null,
-    heroVideo: null,
+    // Заглушка до загрузки своего видео в админке (Mixkit, бесплатная лицензия)
+    heroVideo: {
+      url: '/video/hero.mp4',
+      mobileUrl: '/video/hero-mobile.mp4',
+      poster: { url: '/video/hero-poster.webp', alt: '', width: 1600, height: 900 },
+    },
     slogan: 'дизайн / архитектура',
     heroCta: 'Рассчитаем стоимость проекта под вашу площадь',
     heroCtaAction: 'quiz',

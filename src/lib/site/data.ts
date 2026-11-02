@@ -236,7 +236,7 @@ export async function getBrand(): Promise<Brand> {
       const video = media(b.heroVideo)
       return {
         logo: media(b.logo),
-        heroVideo: video ? { url: video.url, poster: media(b.heroPoster, 'wide') } : null,
+        heroVideo: video ? { url: video.url, poster: media(b.heroPoster, 'wide') } : fb.heroVideo,
         slogan: orDev(b.slogan, fb.slogan),
         heroCta: orDev(b.heroCta, fb.heroCta),
         heroCtaAction: b.heroCtaAction ?? 'quiz',
