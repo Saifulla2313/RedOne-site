@@ -185,7 +185,7 @@ export async function getPricing() {
 export async function getBrand(): Promise<Brand> {
   return {
     logo: null,
-    // Заглушка до загрузки своего видео в админке (Mixkit, бесплатная лицензия)
+    // Заглушка до загрузки своего видео в админке (Pexels #31617692, бесплатная лицензия)
     heroVideo: {
       url: '/video/hero.mp4',
       mobileUrl: '/video/hero-mobile.mp4',
